@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { generatePricingPDF } from "@/lib/simplePdfGenerator";
+import { generateAdvancedPricingPDF } from "@/lib/htmlToPdfGenerator";
 import { FileText, Download } from "lucide-react";
 import { SubjectHours } from "@/lib/pricingCalculations";
+import { useState } from "react";
 
 interface PDFGeneratorProps {
   formData: {
@@ -16,9 +17,18 @@ interface PDFGeneratorProps {
 }
 
 export default function PDFGenerator({ formData, isValid }: PDFGeneratorProps) {
-  const handleGeneratePDF = () => {
-    if (isValid && formData) {
-      generatePricingPDF(formData);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGeneratePDF = async () => {
+    if (isValid && formData && !isGenerating) {
+      setIsGenerating(true);
+      try {
+        await generateAdvancedPricingPDF(formData);
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      } finally {
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -37,10 +47,11 @@ export default function PDFGenerator({ formData, isValid }: PDFGeneratorProps) {
     <div className="flex items-center space-x-4">
       <Button 
         onClick={handleGeneratePDF}
+        disabled={isGenerating}
         className="bg-tc-blue hover:bg-tc-blue/90 text-white font-medium"
       >
         <Download className="mr-2 h-4 w-4" />
-        Generate PDF
+        {isGenerating ? 'Generating...' : 'Generate PDF'}
       </Button>
     </div>
   );
