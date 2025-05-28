@@ -1,7 +1,6 @@
-
-import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
-import logoPath from '../../attached_assets/TC Horizontal.png';
 
 // Register fonts
 Font.register({
@@ -268,7 +267,7 @@ interface PDFDocumentProps {
 
 export function PricingPDFDocument({ formData }: PDFDocumentProps) {
   const { hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
-  
+
   const totalHours = calculateTotalHours(subjects);
   const selectedSubjects = getSelectedSubjects(subjects);
   const timeline = calculateTimeline(totalHours, weeklyHours);
@@ -281,7 +280,6 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 1: Academic Game Plan */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src={logoPath} />
           <View style={styles.titleSection}>
             <Text style={styles.title}>Academic Game Plan</Text>
             <Text style={styles.subtitle}>Tutoring Club</Text>
@@ -331,7 +329,6 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 2: Tuition Payment Options */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src={logoPath} />
           <Text style={styles.title}>Tuition Payment Options</Text>
         </View>
 
