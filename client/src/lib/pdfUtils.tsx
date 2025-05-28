@@ -1,4 +1,5 @@
-import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
+
+<Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
 import logoPath from '@assets/TC Horizontal.png';
 
@@ -15,147 +16,242 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Inter',
-    fontSize: 11,
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingHorizontal: 40,
+    fontSize: 10,
+    paddingTop: 30,
+    paddingBottom: 30,
+    paddingHorizontal: 30,
     backgroundColor: '#ffffff',
-    color: '#000000',
+    color: '#1f2937',
+    lineHeight: 1.4,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 25,
+    paddingBottom: 15,
+    borderBottom: '2 solid #e5e7eb',
   },
   logo: {
-    width: 120,
-    height: 40,
-    marginRight: 16,
+    width: 140,
+    height: 46,
+    marginRight: 20,
   },
   titleSection: {
     flexDirection: 'column',
+    flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#0063a8',
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#f26a31',
+    fontWeight: 500,
   },
   description: {
     fontSize: 11,
     lineHeight: 1.6,
-    color: '#1f2937',
-    marginBottom: 24,
+    color: '#374151',
+    marginBottom: 28,
+    backgroundColor: '#f8fafc',
+    padding: 16,
+    borderRadius: 8,
+    borderLeft: '4 solid #0063a8',
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 600,
+    fontSize: 18,
+    fontWeight: 700,
     color: '#111827',
-    marginBottom: 12,
+    marginBottom: 16,
+    marginTop: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   subsectionTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 600,
-    color: '#111827',
-    marginBottom: 8,
+    color: '#0063a8',
+    marginBottom: 12,
+    marginTop: 20,
   },
   subjectList: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    border: '1 solid #e2e8f0',
   },
   subjectItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     color: '#374151',
+    borderBottom: '1 solid #e2e8f0',
+  },
+  subjectName: {
+    fontSize: 11,
+    fontWeight: 500,
+  },
+  subjectHours: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: '#0063a8',
+    backgroundColor: '#e0f2fe',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
   totalHours: {
-    backgroundColor: '#e8f4fd',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#0063a8',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
   },
   totalHoursText: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  totalHoursLabel: {
     fontSize: 14,
     fontWeight: 600,
-    color: '#374151',
+    color: '#ffffff',
   },
   totalHoursValue: {
-    color: '#0063a8',
+    fontSize: 24,
+    fontWeight: 700,
+    color: '#ffffff',
   },
   timelineContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 24,
+    gap: 12,
+    marginBottom: 30,
   },
   timelineCard: {
     backgroundColor: '#ffffff',
-    border: '1 solid #e5e7eb',
-    borderRadius: 8,
-    padding: 12,
-    width: '23%',
+    border: '2 solid #e0f2fe',
+    borderRadius: 12,
+    padding: 16,
+    width: '22%',
     alignItems: 'center',
+    boxShadow: '0 1 3 rgba(0, 0, 0, 0.1)',
   },
   timelineHours: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#0063a8',
+    marginBottom: 4,
   },
   timelineLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#6b7280',
-    marginVertical: 2,
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   timelineMonths: {
-    fontSize: 10,
-    fontWeight: 500,
+    fontSize: 11,
+    fontWeight: 600,
     color: '#374151',
   },
   table: {
     backgroundColor: '#ffffff',
     border: '1 solid #e5e7eb',
-    borderRadius: 8,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
   },
   tableHeader: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#f1f5f9',
     flexDirection: 'row',
-    borderBottom: '1 solid #e5e7eb',
+    borderBottom: '2 solid #cbd5e1',
   },
   tableHeaderCell: {
     flex: 1,
     padding: 12,
-    fontSize: 10,
-    fontWeight: 600,
-    color: '#374151',
+    fontSize: 9,
+    fontWeight: 700,
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottom: '1 solid #f3f4f6',
+    borderBottom: '1 solid #f1f5f9',
+  },
+  tableRowAlt: {
+    flexDirection: 'row',
+    borderBottom: '1 solid #f1f5f9',
+    backgroundColor: '#fafafa',
   },
   tableCell: {
     flex: 1,
     padding: 12,
     fontSize: 10,
     color: '#374151',
+    fontWeight: 500,
+  },
+  tableCellBold: {
+    flex: 1,
+    padding: 12,
+    fontSize: 10,
+    color: '#111827',
+    fontWeight: 700,
+  },
+  tableCellPrice: {
+    flex: 1,
+    padding: 12,
+    fontSize: 10,
+    color: '#0063a8',
+    fontWeight: 700,
   },
   paymentDescription: {
     fontSize: 11,
-    color: '#374151',
+    color: '#4b5563',
     marginBottom: 16,
     lineHeight: 1.5,
+    backgroundColor: '#f9fafb',
+    padding: 12,
+    borderRadius: 8,
+    fontStyle: 'italic',
   },
-  pageBreak: {
-    marginTop: 40,
+  planTitle: {
+    fontSize: 14,
+    fontWeight: 700,
+    marginBottom: 10,
+    marginTop: 16,
+    color: '#0063a8',
+    backgroundColor: '#e0f2fe',
+    padding: 8,
+    borderRadius: 6,
+    textAlign: 'center',
+  },
+  pageNumber: {
+    position: 'absolute',
+    bottom: 20,
+    right: 30,
+    fontSize: 9,
+    color: '#9ca3af',
+  },
+  highlight: {
+    backgroundColor: '#fef3c7',
+    paddingHorizontal: 4,
+    borderRadius: 2,
+  },
+  savings: {
+    color: '#059669',
+    fontWeight: 700,
+  },
+  discount: {
+    color: '#dc2626',
+    fontWeight: 600,
   },
 });
 
@@ -200,17 +296,20 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
 
         <Text style={styles.sectionTitle}>Recommended Sessions by Subject</Text>
         <View style={styles.subjectList}>
-          {selectedSubjects.map(({ name, hours }) => (
-            <View key={name} style={styles.subjectItem}>
-              <Text>{name}</Text>
-              <Text style={{ fontWeight: 500 }}>{hours} hours</Text>
+          {selectedSubjects.map(({ name, hours }, index) => (
+            <View key={name} style={[
+              styles.subjectItem,
+              index === selectedSubjects.length - 1 && { borderBottom: 'none' }
+            ]}>
+              <Text style={styles.subjectName}>{name}</Text>
+              <Text style={styles.subjectHours}>{hours} hours</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.totalHours}>
           <View style={styles.totalHoursText}>
-            <Text>Total Recommended Hours:</Text>
+            <Text style={styles.totalHoursLabel}>Total Recommended Hours:</Text>
             <Text style={styles.totalHoursValue}>{totalHours} hours</Text>
           </View>
         </View>
@@ -225,6 +324,8 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             </View>
           ))}
         </View>
+
+        <Text style={styles.pageNumber}>Page 1 of 2</Text>
       </Page>
 
       {/* Page 2: Tuition Payment Options */}
@@ -245,10 +346,10 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly Cost</Text>
             <Text style={styles.tableHeaderCell}>Hourly Rate</Text>
           </View>
-          {monthlyOptions.map(({ hoursPerWeek, monthlyCost, hourlyRate: rate }) => (
-            <View key={hoursPerWeek} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hoursPerWeek}</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
+          {monthlyOptions.map(({ hoursPerWeek, monthlyCost, hourlyRate: rate }, index) => (
+            <View key={hoursPerWeek} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+              <Text style={styles.tableCellBold}>{hoursPerWeek}</Text>
+              <Text style={styles.tableCellPrice}>${monthlyCost.toFixed(2)}</Text>
               <Text style={styles.tableCell}>${rate.toFixed(2)}</Text>
             </View>
           ))}
@@ -267,13 +368,13 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Discount</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {prepayOptions.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
+          {prepayOptions.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, savings }, index) => (
+            <View key={hours} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+              <Text style={styles.tableCellBold}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
+              <Text style={styles.tableCellPrice}>${totalCost.toFixed(2)}</Text>
+              <Text style={styles.discount}>{discountPercent}%</Text>
+              <Text style={styles.savings}>${savings.toFixed(2)}</Text>
             </View>
           ))}
         </View>
@@ -286,7 +387,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
         </Text>
 
         {/* 12 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>12 Month Plan</Text>
+        <Text style={styles.planTitle}>12 Month Plan</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableHeaderCell}>Hours</Text>
@@ -296,20 +397,20 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
+          {financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }, index) => (
+            <View key={hours} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+              <Text style={styles.tableCellBold}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
+              <Text style={styles.tableCellPrice}>${totalCost.toFixed(2)}</Text>
+              <Text style={styles.discount}>{discountPercent}%</Text>
+              <Text style={styles.tableCellPrice}>${monthlyCost.toFixed(2)}</Text>
+              <Text style={styles.savings}>${savings.toFixed(2)}</Text>
             </View>
           ))}
         </View>
 
         {/* 18 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, marginTop: 12 }}>18 Month Plan</Text>
+        <Text style={styles.planTitle}>18 Month Plan</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableHeaderCell}>Hours</Text>
@@ -319,20 +420,20 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
+          {financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }, index) => (
+            <View key={hours} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+              <Text style={styles.tableCellBold}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
+              <Text style={styles.tableCellPrice}>${totalCost.toFixed(2)}</Text>
+              <Text style={styles.discount}>{discountPercent}%</Text>
+              <Text style={styles.tableCellPrice}>${monthlyCost.toFixed(2)}</Text>
+              <Text style={styles.savings}>${savings.toFixed(2)}</Text>
             </View>
           ))}
         </View>
 
         {/* 24 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, marginTop: 12 }}>24 Month Plan</Text>
+        <Text style={styles.planTitle}>24 Month Plan</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableHeaderCell}>Hours</Text>
@@ -342,17 +443,19 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {financingOptions.twentyFourMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
+          {financingOptions.twentyFourMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }, index) => (
+            <View key={hours} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+              <Text style={styles.tableCellBold}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
+              <Text style={styles.tableCellPrice}>${totalCost.toFixed(2)}</Text>
+              <Text style={styles.discount}>{discountPercent}%</Text>
+              <Text style={styles.tableCellPrice}>${monthlyCost.toFixed(2)}</Text>
+              <Text style={styles.savings}>${savings.toFixed(2)}</Text>
             </View>
           ))}
         </View>
+
+        <Text style={styles.pageNumber}>Page 2 of 2</Text>
       </Page>
     </Document>
   );
