@@ -277,7 +277,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                               <Input
                                 type="number"
                                 placeholder={defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts]?.toString() || "0"}
-                                step="0.1"
+                                step="1"
                                 min="0"
                                 max="100"
                                 {...field}
@@ -309,7 +309,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                               <Input
                                 type="number"
                                 placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
-                                step="0.1"
+                                step="1"
                                 min="0"
                                 max="100"
                                 {...field}
