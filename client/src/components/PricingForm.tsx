@@ -125,12 +125,10 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   <FormLabel>Hourly Tutoring Rate ($)</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
+                      type="text"
+                      placeholder="$50"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)}
                       className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
                     />
                   </FormControl>
