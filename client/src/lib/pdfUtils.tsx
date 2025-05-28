@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
+import logoPath from '@assets/TC Horizontal.png';
 
 // Register fonts
 Font.register({
@@ -19,6 +20,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     paddingHorizontal: 40,
     backgroundColor: '#ffffff',
+    color: '#000000',
   },
   header: {
     flexDirection: 'row',
@@ -26,19 +28,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   logo: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#0063a8',
-    borderRadius: 8,
+    width: 120,
+    height: 40,
     marginRight: 16,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
   },
   titleSection: {
     flexDirection: 'column',
@@ -56,7 +48,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 11,
     lineHeight: 1.6,
-    color: '#374151',
+    color: '#1f2937',
     marginBottom: 24,
   },
   sectionTitle: {
@@ -81,6 +73,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 4,
+    color: '#374151',
   },
   totalHours: {
     backgroundColor: '#e8f4fd',
@@ -93,6 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     fontSize: 14,
     fontWeight: 600,
+    color: '#374151',
   },
   totalHoursValue: {
     color: '#0063a8',
@@ -124,6 +118,7 @@ const styles = StyleSheet.create({
   timelineMonths: {
     fontSize: 10,
     fontWeight: 500,
+    color: '#374151',
   },
   table: {
     backgroundColor: '#ffffff',
@@ -190,9 +185,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 1: Academic Game Plan */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <View style={styles.logo}>
-            <Text style={styles.logoText}>TC</Text>
-          </View>
+          <Image style={styles.logo} src={logoPath} />
           <View style={styles.titleSection}>
             <Text style={styles.title}>Academic Game Plan</Text>
             <Text style={styles.subtitle}>Tutoring Club</Text>
@@ -237,9 +230,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 2: Tuition Payment Options */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <View style={[styles.logo, { backgroundColor: '#f26a31' }]}>
-            <Text style={styles.logoText}>$</Text>
-          </View>
+          <Image style={styles.logo} src={logoPath} />
           <Text style={styles.title}>Tuition Payment Options</Text>
         </View>
 
