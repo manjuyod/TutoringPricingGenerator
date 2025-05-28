@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { pdf } from '@react-pdf/renderer';
-import { PricingPDFDocument } from '@/lib/pdfUtils';
+import { generatePricingPDF } from "@/lib/simplePdfGenerator";
 import { FileText, Download } from "lucide-react";
 import { SubjectHours } from "@/lib/pricingCalculations";
 
@@ -17,19 +16,9 @@ interface PDFGeneratorProps {
 }
 
 export default function PDFGenerator({ formData, isValid }: PDFGeneratorProps) {
-  const handleGeneratePDF = async () => {
+  const handleGeneratePDF = () => {
     if (isValid && formData) {
-      try {
-        const blob = await pdf(<PricingPDFDocument formData={formData} />).toBlob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'tutoring-club-pricing-sheet.pdf';
-        link.click();
-        URL.revokeObjectURL(url);
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-      }
+      generatePricingPDF(formData);
     }
   };
 
