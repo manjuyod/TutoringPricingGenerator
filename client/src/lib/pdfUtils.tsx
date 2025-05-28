@@ -1,20 +1,19 @@
-import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
-import logoPath from '@assets/TC Horizontal.png';
 
-// Register fonts
+// Use system fonts that are more reliable
 Font.register({
-  family: 'Inter',
+  family: 'Helvetica',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2' },
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2', fontWeight: 600 },
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2', fontWeight: 700 },
+    { src: 'Helvetica' },
+    { src: 'Helvetica-Bold', fontWeight: 'bold' },
   ]
 });
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: 'Inter',
+    fontFamily: 'Helvetica',
     fontSize: 11,
     paddingTop: 40,
     paddingBottom: 40,
@@ -23,17 +22,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 30,
-  },
-  logo: {
-    width: 120,
-    height: 40,
-    marginRight: 16,
-  },
-  titleSection: {
-    flexDirection: 'column',
   },
   title: {
     fontSize: 24,
@@ -44,6 +33,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#f26a31',
+    marginBottom: 20,
   },
   description: {
     fontSize: 11,
@@ -53,13 +43,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 600,
+    fontWeight: 'bold',
     color: '#111827',
     marginBottom: 12,
   },
   subsectionTitle: {
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: 'bold',
     color: '#111827',
     marginBottom: 8,
   },
@@ -85,7 +75,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: 'bold',
     color: '#374151',
   },
   totalHoursValue: {
@@ -117,7 +107,7 @@ const styles = StyleSheet.create({
   },
   timelineMonths: {
     fontSize: 10,
-    fontWeight: 500,
+    fontWeight: 'bold',
     color: '#374151',
   },
   table: {
@@ -135,7 +125,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     fontSize: 10,
-    fontWeight: 600,
+    fontWeight: 'bold',
     color: '#374151',
   },
   tableRow: {
@@ -154,9 +144,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 1.5,
   },
-  pageBreak: {
-    marginTop: 40,
-  },
 });
 
 interface PDFDocumentProps {
@@ -172,7 +159,7 @@ interface PDFDocumentProps {
 
 export function PricingPDFDocument({ formData }: PDFDocumentProps) {
   const { hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
-  
+
   const totalHours = calculateTotalHours(subjects);
   const selectedSubjects = getSelectedSubjects(subjects);
   const timeline = calculateTimeline(totalHours, weeklyHours);
@@ -185,11 +172,8 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 1: Academic Game Plan */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src={logoPath} />
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>Academic Game Plan</Text>
-            <Text style={styles.subtitle}>Tutoring Club</Text>
-          </View>
+          <Text style={styles.title}>Academic Game Plan</Text>
+          <Text style={styles.subtitle}>Tutoring Club</Text>
         </View>
 
         <Text style={styles.description}>
@@ -203,7 +187,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
           {selectedSubjects.map(({ name, hours }) => (
             <View key={name} style={styles.subjectItem}>
               <Text>{name}</Text>
-              <Text style={{ fontWeight: 500 }}>{hours} hours</Text>
+              <Text style={{ fontWeight: 'bold' }}>{hours} hours</Text>
             </View>
           ))}
         </View>
@@ -230,7 +214,6 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
       {/* Page 2: Tuition Payment Options */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src={logoPath} />
           <Text style={styles.title}>Tuition Payment Options</Text>
         </View>
 
@@ -286,7 +269,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
         </Text>
 
         {/* 12 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>12 Month Plan</Text>
+        <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8 }}>12 Month Plan</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableHeaderCell}>Hours</Text>
@@ -297,52 +280,6 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
           {financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
-              <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* 18 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, marginTop: 12 }}>18 Month Plan</Text>
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>Hours</Text>
-            <Text style={styles.tableHeaderCell}>Adj. Rate</Text>
-            <Text style={styles.tableHeaderCell}>Total</Text>
-            <Text style={styles.tableHeaderCell}>Discount</Text>
-            <Text style={styles.tableHeaderCell}>Monthly</Text>
-            <Text style={styles.tableHeaderCell}>Savings</Text>
-          </View>
-          {financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
-            <View key={hours} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{hours}</Text>
-              <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${totalCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>{discountPercent}%</Text>
-              <Text style={styles.tableCell}>${monthlyCost.toFixed(2)}</Text>
-              <Text style={styles.tableCell}>${savings.toFixed(2)}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* 24 Month Plan */}
-        <Text style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, marginTop: 12 }}>24 Month Plan</Text>
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>Hours</Text>
-            <Text style={styles.tableHeaderCell}>Adj. Rate</Text>
-            <Text style={styles.tableHeaderCell}>Total</Text>
-            <Text style={styles.tableHeaderCell}>Discount</Text>
-            <Text style={styles.tableHeaderCell}>Monthly</Text>
-            <Text style={styles.tableHeaderCell}>Savings</Text>
-          </View>
-          {financingOptions.twentyFourMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
             <View key={hours} style={styles.tableRow}>
               <Text style={styles.tableCell}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
