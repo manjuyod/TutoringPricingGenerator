@@ -98,25 +98,23 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
 async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
   // Add title
-  pdf.setFontSize(24);
+  pdf.setFontSize(20);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Tuition Payment Options', 20, 30);
+  pdf.text('Tuition Payment Options', 20, 25);
 
-  let yPosition = 50;
+  let yPosition = 40;
 
   // Monthly Tuition Option
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.setTextColor(0, 0, 0);
   pdf.text('Monthly Tuition Option', 20, yPosition);
+  yPosition += 8;
+
+  pdf.setFontSize(9);
+  pdf.text('Pay as you go monthly. Testing fee: $75. Registration fee: $100.', 20, yPosition);
   yPosition += 10;
 
-  pdf.setFontSize(11);
-  pdf.text('Pay as you go on a monthly basis at our standard hourly rate.', 20, yPosition);
-  yPosition += 5;
-  pdf.text('Testing fee: $75. Registration fee: $100.', 20, yPosition);
-  yPosition += 15;
-
-  // Monthly options table
+  // Monthly options table - smaller
   autoTable(pdf, {
     startY: yPosition,
     head: [['Hours/Week', 'Monthly Cost', 'Hourly Rate']],
@@ -126,23 +124,23 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
       `$${hourlyRate.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 5 },
+    styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [0, 99, 168], textColor: 255 },
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 20;
+  yPosition = (pdf as any).lastAutoTable.finalY + 12;
 
   // Prepay Tuition Option
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.text('Prepay Tuition Option', 20, yPosition);
+  yPosition += 8;
+
+  pdf.setFontSize(9);
+  pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition);
   yPosition += 10;
 
-  pdf.setFontSize(11);
-  pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition);
-  yPosition += 15;
-
-  // Prepay options table
+  // Prepay options table - smaller
   autoTable(pdf, {
     startY: yPosition,
     head: [['Hours', 'Adj. Rate', 'Total Cost', 'Discount', 'Savings']],
@@ -154,31 +152,26 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
       `$${savings.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 5 },
+    styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [0, 99, 168], textColor: 255 },
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 20;
+  yPosition = (pdf as any).lastAutoTable.finalY + 12;
 
   // 0% Interest Tuition Option
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.text('0% Interest Tuition Option', 20, yPosition);
+  yPosition += 8;
+
+  pdf.setFontSize(9);
+  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition);
   yPosition += 10;
-
-  pdf.setFontSize(11);
-  const interestText = 'No testing or registration fees. Flexible scheduling. No payments for 4-6 weeks.';
-  const splitText = pdf.splitTextToSize(interestText, 170);
-  pdf.text(splitText, 20, yPosition);
-  yPosition += splitText.length * 5 + 10;
-
-  pdf.text('No out-of-pocket expenses or down payments. Early prepayment allowed. On approved credit.', 20, yPosition);
-  yPosition += 15;
 
   // 12 Month Plan
-  pdf.setFontSize(14);
+  pdf.setFontSize(12);
   pdf.text('12 Month Plan', 20, yPosition);
-  yPosition += 10;
+  yPosition += 6;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -192,7 +185,55 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
       `$${savings.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 5 },
+    styles: { fontSize: 7, cellPadding: 2 },
+    headStyles: { fillColor: [0, 99, 168], textColor: 255 },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
+
+  // 18 Month Plan
+  pdf.setFontSize(12);
+  pdf.text('18 Month Plan', 20, yPosition);
+  yPosition += 6;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
+    body: financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
+      hours.toString(),
+      `$${adjustedHourlyRate.toFixed(2)}`,
+      `$${totalCost.toFixed(2)}`,
+      `${discountPercent}%`,
+      `$${monthlyCost.toFixed(2)}`,
+      `$${savings.toFixed(2)}`
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 7, cellPadding: 2 },
+    headStyles: { fillColor: [0, 99, 168], textColor: 255 },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
+
+  // 24 Month Plan
+  pdf.setFontSize(12);
+  pdf.text('24 Month Plan', 20, yPosition);
+  yPosition += 6;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
+    body: financingOptions.twentyFourMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
+      hours.toString(),
+      `$${adjustedHourlyRate.toFixed(2)}`,
+      `$${totalCost.toFixed(2)}`,
+      `${discountPercent}%`,
+      `$${monthlyCost.toFixed(2)}`,
+      `$${savings.toFixed(2)}`
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 7, cellPadding: 2 },
     headStyles: { fillColor: [0, 99, 168], textColor: 255 },
     margin: { left: 20, right: 20 }
   });
