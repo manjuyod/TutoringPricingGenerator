@@ -102,21 +102,21 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setTextColor(0, 99, 168);
   pdf.text('Tuition Payment Options', 20, 25);
 
-  let yPosition = 40;
+  let yPosition = 38;
 
   // Section 1: Monthly Tuition Option (Light blue background)
   pdf.setFillColor(240, 248, 255); // Light blue background
-  pdf.rect(15, yPosition - 5, 180, 50, 'F');
+  pdf.rect(15, yPosition - 3, 180, 25, 'F');
   
-  pdf.setFontSize(16);
+  pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Monthly Tuition Option', 20, yPosition + 5);
-  yPosition += 12;
+  pdf.text('Monthly Tuition Option', 20, yPosition + 3);
+  yPosition += 8;
 
-  pdf.setFontSize(10);
+  pdf.setFontSize(8);
   pdf.setTextColor(0, 0, 0);
   pdf.text('Pay as you go monthly. Testing fee: $75. Registration fee: $100.', 20, yPosition);
-  yPosition += 10;
+  yPosition += 5;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -132,21 +132,21 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 15;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 2: Prepay Tuition Option (Light green background)
   pdf.setFillColor(240, 255, 240); // Light green background
-  pdf.rect(15, yPosition - 5, 180, 50, 'F');
+  pdf.rect(15, yPosition - 3, 180, 25, 'F');
   
-  pdf.setFontSize(16);
+  pdf.setFontSize(13);
   pdf.setTextColor(34, 139, 34);
-  pdf.text('Prepay Tuition Option', 20, yPosition + 5);
-  yPosition += 12;
+  pdf.text('Prepay Tuition Option', 20, yPosition + 3);
+  yPosition += 8;
 
-  pdf.setFontSize(10);
+  pdf.setFontSize(8);
   pdf.setTextColor(0, 0, 0);
   pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition);
-  yPosition += 10;
+  yPosition += 5;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -164,27 +164,27 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 15;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 3: 0% Interest Tuition Option (Light orange background)
   pdf.setFillColor(255, 248, 240); // Light orange background
-  pdf.rect(15, yPosition - 5, 180, 65, 'F');
+  pdf.rect(15, yPosition - 3, 180, 35, 'F');
   
-  pdf.setFontSize(16);
-  pdf.setTextColor(255, 140, 0);
-  pdf.text('0% Interest Tuition Option', 20, yPosition + 5);
-  yPosition += 12;
-
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition);
-  yPosition += 12;
-
-  // 12 Month Plan
   pdf.setFontSize(13);
   pdf.setTextColor(255, 140, 0);
-  pdf.text('12 Month Plan', 20, yPosition);
+  pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
   yPosition += 8;
+
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition);
+  yPosition += 8;
+
+  // 12 Month Plan
+  pdf.setFontSize(11);
+  pdf.setTextColor(255, 140, 0);
+  pdf.text('12 Month Plan', 20, yPosition);
+  yPosition += 6;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -203,13 +203,13 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 8;
+  yPosition = (pdf as any).lastAutoTable.finalY + 5;
 
   // 18 Month Plan
-  pdf.setFontSize(13);
+  pdf.setFontSize(11);
   pdf.setTextColor(255, 140, 0);
   pdf.text('18 Month Plan', 20, yPosition);
-  yPosition += 8;
+  yPosition += 6;
 
   autoTable(pdf, {
     startY: yPosition,
