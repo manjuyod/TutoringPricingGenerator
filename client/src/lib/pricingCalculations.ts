@@ -129,6 +129,6 @@ export function calculateFinancingOptions(
   return {
     twelveMonth: calculateForTerm(12, 0),
     eighteenMonth: calculateForTerm(18, -5),
-    twentyFourMonth: calculateForTerm(24, -10)
+    twentyFourMonth: calculateForTerm(24, -5)
   };
 }
