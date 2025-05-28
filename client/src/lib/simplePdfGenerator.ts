@@ -167,7 +167,7 @@ export function generatePricingPDF(formData: PdfFormData): void {
   yPosition = addText('18 Month Plan', 20, yPosition, { lineHeight: 8 });
   pdf.setFontSize(10);
   yPosition = addText('Hours  Adj.Rate  Total   Discount  Monthly  Savings', 20, yPosition);
-  financingOptions.eighteenMonth.slice(0, 2).forEach(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => {
+  financingOptions.eighteenMonth.forEach(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => {
     yPosition = checkPageBreak(yPosition);
     yPosition = addText(`${hours}    $${adjustedHourlyRate.toFixed(2)}    $${totalCost.toFixed(2)}  ${discountPercent}%     $${monthlyCost.toFixed(2)}   $${savings.toFixed(2)}`, 20, yPosition, { lineHeight: 5 });
   });
@@ -180,7 +180,7 @@ export function generatePricingPDF(formData: PdfFormData): void {
   yPosition = addText('24 Month Plan', 20, yPosition, { lineHeight: 8 });
   pdf.setFontSize(10);
   yPosition = addText('Hours  Adj.Rate  Total   Discount  Monthly  Savings', 20, yPosition);
-  financingOptions.twentyFourMonth.slice(0, 2).forEach(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => {
+  financingOptions.twentyFourMonth.forEach(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => {
     yPosition = checkPageBreak(yPosition);
     yPosition = addText(`${hours}    $${adjustedHourlyRate.toFixed(2)}    $${totalCost.toFixed(2)}  ${discountPercent}%     $${monthlyCost.toFixed(2)}   $${savings.toFixed(2)}`, 20, yPosition, { lineHeight: 5 });
   });

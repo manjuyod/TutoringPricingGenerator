@@ -319,7 +319,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {financingOptions.eighteenMonth.slice(0, 2).map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
+          {financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
             <View key={hours} style={styles.tableRow}>
               <Text style={styles.tableCell}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
@@ -342,7 +342,7 @@ export function PricingPDFDocument({ formData }: PDFDocumentProps) {
             <Text style={styles.tableHeaderCell}>Monthly</Text>
             <Text style={styles.tableHeaderCell}>Savings</Text>
           </View>
-          {financingOptions.twentyFourMonth.slice(0, 2).map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
+          {financingOptions.twentyFourMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => (
             <View key={hours} style={styles.tableRow}>
               <Text style={styles.tableCell}>{hours}</Text>
               <Text style={styles.tableCell}>${adjustedHourlyRate.toFixed(2)}</Text>
