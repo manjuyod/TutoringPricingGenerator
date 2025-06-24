@@ -41,15 +41,20 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
   // Create HTML content for page 1
   const htmlContent = `
     <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
-      <!-- Header Section -->
-      <div style="margin-bottom: 30px;">
-        <h1 style="font-size: 32px; font-weight: bold; color: #0063a8; margin: 0 0 8px 0;">Academic Game Plan</h1>
-        <h2 style="font-size: 18px; color: #f26a31; margin: 0 0 20px 0;">Tutoring Club</h2>
+      <!-- Header Section with Logo -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px; background: linear-gradient(135deg, #0063a8 0%, #0e406a 100%); border-radius: 12px;">
+        <div>
+          <h1 style="font-size: 36px; font-weight: bold; color: white; margin: 0 0 8px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Academic Game Plan</h1>
+          <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
+        </div>
+        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTIwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSIyNSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwNjNhOCI+VHV0b3JpbmcgQ2x1YjwvdGV4dD48L3N2Zz4=" alt="Tutoring Club Logo" style="height: 40px; width: auto;">
+        </div>
       </div>
 
       <!-- Description -->
-      <div style="margin-bottom: 30px;">
-        <p style="font-size: 14px; line-height: 1.6; color: #1f2937; margin: 0;">
+      <div style="margin-bottom: 40px; background: #f8fafc; border-left: 4px solid #f26a31; padding: 24px; border-radius: 8px;">
+        <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0; font-style: italic;">
           At Tutoring Club, we believe every student has the potential to thrive—with the right support. 
           Based on your academic goals and our in-depth assessment, we've put together a customized roadmap 
           designed to close learning gaps, build confidence, and get results.
@@ -57,37 +62,59 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       </div>
 
       <!-- Recommended Sessions -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 16px 0;">Recommended Sessions by Subject</h3>
-        <div style="background: #f9fafb; border-radius: 8px; padding: 20px;">
-          ${selectedSubjects.map(({ name, hours }) => `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
-              <span style="color: #374151; font-size: 14px;">${name}</span>
-              <span style="color: #0063a8; font-weight: bold; font-size: 14px;">${hours} hours</span>
+      <div style="margin-bottom: 40px;">
+        <h3 style="font-size: 24px; font-weight: bold; color: #0e406a; margin: 0 0 20px 0; border-bottom: 3px solid #f26a31; padding-bottom: 8px;">Recommended Sessions by Subject</h3>
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-radius: 12px; padding: 24px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          ${selectedSubjects.map(({ name, hours }, index) => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; margin-bottom: ${index === selectedSubjects.length - 1 ? '0' : '12px'}; background: white; border-radius: 8px; border-left: 4px solid #0063a8; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <span style="color: #1f2937; font-size: 16px; font-weight: 500;">${name}</span>
+              <span style="background: #0063a8; color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px;">${hours} hours</span>
             </div>
           `).join('')}
         </div>
       </div>
 
       <!-- Total Hours -->
-      <div style="background: #e8f4fd; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 18px; font-weight: bold; color: #374151;">Total Recommended Hours:</span>
-          <span style="font-size: 20px; font-weight: bold; color: #0063a8;">${totalHours} hours</span>
+      <div style="background: linear-gradient(135deg, #0063a8 0%, #0e406a 100%); border-radius: 12px; padding: 28px; margin-bottom: 40px; text-align: center; box-shadow: 0 6px 12px rgba(0,99,168,0.2);">
+        <div style="color: white;">
+          <div style="font-size: 16px; margin-bottom: 8px; opacity: 0.9;">Total Recommended Hours</div>
+          <div style="font-size: 42px; font-weight: bold; margin-bottom: 4px;">${totalHours}</div>
+          <div style="font-size: 18px; opacity: 0.9;">hours</div>
         </div>
       </div>
 
-      <!-- Timeline -->
+      <!-- Timeline Bar Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #111827; margin: 0 0 16px 0;">Recommended Timeline</h3>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          ${timeline.map(({ hoursPerWeek, months }) => `
-            <div style="background: white; border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; text-align: center; min-width: 120px;">
-              <div style="font-size: 24px; font-weight: bold; color: #0063a8;">${hoursPerWeek}</div>
-              <div style="font-size: 12px; color: #6b7280; margin: 4px 0;">hours/week</div>
-              <div style="font-size: 14px; font-weight: bold; color: #374151;">${months} months</div>
+        <h3 style="font-size: 24px; font-weight: bold; color: #0e406a; margin: 0 0 24px 0; border-bottom: 3px solid #f26a31; padding-bottom: 8px;">Recommended Timeline Options</h3>
+        <div style="background: white; border-radius: 12px; padding: 32px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span style="font-size: 14px; color: #6b7280;">Hours per Week</span>
+              <span style="font-size: 14px; color: #6b7280;">Completion Time</span>
             </div>
-          `).join('')}
+            ${timeline.map(({ hoursPerWeek, months }, index) => {
+              const maxMonths = Math.max(...timeline.map(t => t.months));
+              const barWidth = (months / maxMonths) * 100;
+              const colors = ['#0063a8', '#f26a31', '#0e406a', '#f9c546'];
+              const color = colors[index % colors.length];
+              return `
+                <div style="margin-bottom: 20px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: bold; color: #1f2937; font-size: 16px;">${hoursPerWeek} hrs/week</span>
+                    <span style="font-weight: bold; color: ${color}; font-size: 16px;">${months} months</span>
+                  </div>
+                  <div style="background: #f1f5f9; border-radius: 20px; height: 24px; position: relative; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, ${color} 0%, ${color}CC 100%); height: 100%; width: ${barWidth}%; border-radius: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                      <span style="color: white; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${months}m</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div style="text-align: center; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            <span style="font-size: 12px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
+          </div>
         </div>
       </div>
     </div>
@@ -97,19 +124,24 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 }
 
 async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
-  // Add title
-  pdf.setFontSize(22);
-  pdf.setTextColor(0, 99, 168);
+  // Add title with brand styling
+  pdf.setFontSize(24);
+  pdf.setTextColor(14, 64, 106); // Navy color
   pdf.text('Tuition Payment Options', 20, 25);
+  
+  // Add subtitle
+  pdf.setFontSize(12);
+  pdf.setTextColor(242, 106, 49); // Orange color
+  pdf.text('Flexible payment solutions designed for your budget', 20, 35);
 
-  let yPosition = 38;
+  let yPosition = 48;
 
-  // Section 1: Monthly Tuition Option (Light blue background)
-  pdf.setFillColor(240, 248, 255); // Light blue background
+  // Section 1: Monthly Tuition Option (Blue theme)
+  pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
   pdf.rect(15, yPosition - 3, 180, 25, 'F');
   
   pdf.setFontSize(13);
-  pdf.setTextColor(0, 99, 168);
+  pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
   yPosition += 8;
 
@@ -134,12 +166,12 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
-  // Section 2: Prepay Tuition Option (Light green background)
-  pdf.setFillColor(240, 255, 240); // Light green background
+  // Section 2: Prepay Tuition Option (Orange theme)
+  pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
   pdf.rect(15, yPosition - 3, 180, 25, 'F');
   
   pdf.setFontSize(13);
-  pdf.setTextColor(34, 139, 34);
+  pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
   yPosition += 8;
 
@@ -160,18 +192,18 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     ]),
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [34, 139, 34], textColor: 255 },
+    headStyles: { fillColor: [242, 106, 49], textColor: 255 }, // Brand orange header
     margin: { left: 20, right: 20 }
   });
 
   yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
-  // Section 3: 0% Interest Tuition Option (Light orange background)
-  pdf.setFillColor(255, 248, 240); // Light orange background
+  // Section 3: 0% Interest Tuition Option (Navy theme)
+  pdf.setFillColor(240, 245, 250); // Light navy background using brand navy
   pdf.rect(15, yPosition - 3, 180, 35, 'F');
   
   pdf.setFontSize(13);
-  pdf.setTextColor(255, 140, 0);
+  pdf.setTextColor(14, 64, 106); // Brand navy
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
   yPosition += 8;
 
@@ -182,7 +214,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   // 12 Month Plan
   pdf.setFontSize(11);
-  pdf.setTextColor(255, 140, 0);
+  pdf.setTextColor(14, 64, 106); // Brand navy
   pdf.text('12 Month Plan', 20, yPosition);
   yPosition += 6;
 
@@ -199,7 +231,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     ]),
     theme: 'grid',
     styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [255, 140, 0], textColor: 255 },
+    headStyles: { fillColor: [14, 64, 106], textColor: 255 }, // Brand navy header
     margin: { left: 20, right: 20 }
   });
 
@@ -207,7 +239,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   // 18 Month Plan
   pdf.setFontSize(11);
-  pdf.setTextColor(255, 140, 0);
+  pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('18 Month Plan', 20, yPosition);
   yPosition += 6;
 
@@ -224,7 +256,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     ]),
     theme: 'grid',
     styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [255, 140, 0], textColor: 255 },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0] }, // Brand yellow header with black text for readability
     margin: { left: 20, right: 20 }
   });
 }
