@@ -42,13 +42,13 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
   const htmlContent = `
     <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px; background: linear-gradient(135deg, #0063a8 0%, #0e406a 100%); border-radius: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-bottom: 3px solid #0063a8;">
         <div>
-          <h1 style="font-size: 36px; font-weight: bold; color: white; margin: 0 0 8px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Academic Game Plan</h1>
+          <h1 style="font-size: 36px; font-weight: bold; color: #0063a8; margin: 0 0 8px 0;">Academic Game Plan</h1>
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
-        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTIwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSIyNSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwNjNhOCI+VHV0b3JpbmcgQ2x1YjwvdGV4dD48L3N2Zz4=" alt="Tutoring Club Logo" style="height: 40px; width: auto;">
+        <div>
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAoCAYAAAAGFQO8AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAj8SURBVHic7ZxrbBTXFcd/M2uv7bXX6/V6/cBgGxtjG4MxECeEkJCGR0KaBiVRo6qNWlWtGrVSpbZSP7Sf2qpSP7RSq6pqq6pV1SZNmqZJ2qRJSJOQkJAAMRgwGBvjB7Zf6/Vr/Zi1PXP7YWZnZmd2dmftXXum/Unr2dmZe++953/Pveece+cKwG/8xi98gN/4jd/4jd/4jd/4jd/4jd/4jd/4zf/FfKJ/wJkz59Dv92Pu3LlYsmQJotEoxsfHMTg4iImJCZSVlaGurg7l5eWIRqOYPXs2ysrKIIoiJicnMTIygiAEsFAUBfF4HKFQCDMzM7h+/Tpu3LiBrq4u3L59G3PmzMGqVauwdOlSLFy4EHV1dVi4cKGTr5OTkxgaGsLY2BiGh4fR19eH7u5udHd3Y2hoCEVFRYhEIggGg5AkCaFQCJFIBOFwGOXl5Vi0aBGampqwZMkSRCIRlJaWori4GMFgkD/3xMQERkdHMTIygps3b6K3txdDQ0OIxWK4c+cOZFlGMBhEaWkpQqEQwuEwKioqUFNTg7q6OjQ0NKCxsRGNjY2oqamBKIpe/Dma8YywgsEg5s2bh/Hjxz9/PJFIbA4Go68IgqBNT08/lJKSciRffLRrHB8fx+3bt2Fxer65cxDT09MQBAGCIEAURRQVFaGoqAjBYBCRSATV1dWora3FnDlzUF5erlW0TCaD8fFx9PX1oaurC1evXsXg4CBGRkawevVq1NbWoqurC1euXMHVq1dx+/ZtiKKIiooKLFmyBMuWLcPChQtRU1OD0tJS/ZYHBwfR09ODnp4e3Lp1C8PDwxgbG0MymYQkyygpKUE4HEZZWRkqKysxe/ZsVFVVoby8HGVlZSgqKkIwGERJSQmCwSAkSUIymcT4+DjGx8cxOjqK4eFhDAwMYGhoCOPj48hkMkilUsjlchBFEcFgEEVFRQgEAggEAgiFQoiGw1izZg0aGhqwdOlSLFmyBPPnz0dRUZEXf45mXBWZyWQQj8eRSqWQzWZRUlKCRCKBaDSKoqIiFBUVQZZlqKqKbDaLzMwMxsfH0d/fj0AggObmZixatMhJLZwjyzJu3bqFa9eu4datW8hkMkilUpBlGel0GqlUCsPDw3xFkGUZxcXFCAQCCAQCkCQJwWAQwWAQZWVlqKysxJw5c1BfX4+6ujrU1dWhrq4O5eXlCAaDKCoqgqIoyOfzSKfTGB8fR39/P3p7e9HX14fe3l6+U0qlUlAUBdlsFuPj4/yzSJIEURQhCAJEUYQgCJAkCaFQCJWVlaiqqkJNTQ1qa2sxe/ZsVFdXo7KyEuXl5YhGoxBFEZlMBolEAuPj4xgeHkZ/fz/6+vowODiIoaEhDAwMYHR0FLFYDKlUCslkEtlsFoqioKSkBOFwGJFIBJFIBJWVlairq0NjYyMWLlyIpqYmLFy4EHPnznVSC7fwdGOp6sxMYmoqhpmZGRQXF2N8fBy3bt3CxMQEOjo6sHPnTnR0dKCjowOdnZ0cH5FIBKtXr8bq1auxfPlyNDY2oqKiwq0nCJ6TLMu4c+cOrly5gu7ubuTzeeRyOeRyOaTTaczMzCCRSCCRSGBychLxeBzxeByzZs3CrFmz0NLSgvb2djQ3N6O+vh5VVVVIRCI4deoUrly5gu7ubkxMTEBVVWQyGUxPT2NychJjY2MYHx/H1NQUJicnMTMzg0wmg0AggFAohHA4zE1pZWUlZs2ahaqqqrdlxONxjI2NYWxsDLFYDLFYDPF4HBMTExgfH8fExASmpqYwPT2NVCqFdDqNVCqFdDqNXC4HWZYRDAYRCoUQDAYhSRKKioq4qeaoKysrQ21tLVpaWrBkyRKcO3cOH/7wh7Fx40Zs2LAB27ZtQ1tbGx8Urz37LeDZxpqenUVu1iyepObOncuPcm3atAnd3d0AgNraWgwNDaG8vBwrVqzAM888g61bt6K5uRl1dXVoaGhAY2OjGz3e4zGbzeLatWv43e9+hwsXLnBTJcsyMpkMEokERkdHMT4+jlgshpmZGeTzeciyjKKiIgQCAdTU1KC1tRUrVqzAunXrsGnTJqxcuRINDQ0AcuZyenoan3zEOE5PT6O4uBgAmhsaGnDmzBm89NJLaG9vxzPPPIO1a9di0aJFvFOmeDcA5ubmAADr1q3DP/7xDzz//PN49tlnsX79eqxZswatra04deoU4vE4r5usrABwuJZjubVzFOCpsQBcF0Xh9yzLHhZF8R+yLP++qKjoyCcOH/7e3vb2H36tpemtba+9+f8dHR1r8Z5mKy+lqKhIdbOBjz/+eJdWB/f29rb5fD1vVaRHo9H9sizfklJ6o9XZabXwC58k/8YOWEbOSfQyW2Zrc+Ou29L8P8oybD/7+/v5CtRWXl4OOzszg8WLF1vuwUfP8w6xelAr8ZsVBcDXAXQCeADAXwF8CcA5u+p7Fd0PjqMAXgfQDmAVgP8C+Arsl5dXfQ9Vd58TfbG5XA5Hjx7F8PAwH4RYLIZz585hfHwctbW1ADK7f/Ob37xk9nxdunTJKC6+jlUz7rGDN1ZnAXxKzfJlUcQKSZIwPT2NoaEhDA4OoqenB1evXsXZs2dx7tw5dHZ2oqOjA11dXRgbG0M8HudLciqVQjKZRDqdRjabtb3jNw1r9T2dxLH1vfrqq9i/fz9efPFFHDt2DGfPnsXp06fx5ptv4syZMzh58iROnz6NN998Ey+++CIOHDiAI0eO4NixY+ju7kZvby+Gh4eRy+X4yk8WF7sY2Mm9Xa6Rb9v9KJ6Nxe6PtZbdu3djcHAQw8PDGBkZwdjYGMbGxjA0NIS2tjZ0dXUBAF5//XVs374db7zxBgDg5ZdfxiOPPAJBELBv3z48++yzfLPiRb3Nvle3xjH/ntZvq+wlS5bg8ccf575ROp3G0NAQhoeHkUwmoes6e/fu3e8cJqw+r+fhTf06qWKyYt2ybUb3xGZNdfNcHStR2YlbKWvzfZPJJBRF4RGUl19+2arLjnUW50ks/RYv7j3/f3OdqL+J/PaI0fdsXOaFbY1WnNr1m46bOZZK9WcH2mLv/v6fQVc70fbX9fUaP5zx7GNp3vBObSy7HvvY/N4q8+b2rq7mKr9v7l63+qiPJnGp7Hs2a2uNqhgQhEBbVVX1CzNnzjzK/qkDAA4dOuTUlQFz3i7bJI4dO+ak7I3OkfNjFXmbvZPNZm+kUqnZAPDggw8+qCjKCQB//cCNN37S3Nz8k6Kioi8DWGnn4jvFwj5W96hHWqz2/Bz9W/Y5FhcDKWCFk5KAy4LXG/9V8jvXB1bIVUz//7zx/wFkD4aPbzYjswAAAABJRU5ErkJggg==" alt="Tutoring Club Logo" style="height: 60px; width: auto;">
         </div>
       </div>
 
@@ -66,21 +66,21 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
         <h3 style="font-size: 24px; font-weight: bold; color: #0e406a; margin: 0 0 20px 0; border-bottom: 3px solid #f26a31; padding-bottom: 8px;">Recommended Sessions by Subject</h3>
         <div style="display: flex; gap: 24px;">
           <!-- Subjects List -->
-          <div style="flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-radius: 12px; padding: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <div style="flex: 1; padding: 20px;">
             ${selectedSubjects.map(({ name, hours }, index) => `
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: ${index === selectedSubjects.length - 1 ? '0' : '8px'}; background: white; border-radius: 8px; border-left: 4px solid #0063a8; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <span style="color: #1f2937; font-size: 15px; font-weight: 500;">${name}</span>
-                <span style="background: #0063a8; color: white; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 13px;">${hours} hours</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-bottom: ${index === selectedSubjects.length - 1 ? '0' : '8px'}; border-bottom: 1px solid #e2e8f0;">
+                <span style="color: #1f2937; font-size: 16px; font-weight: 500;">${name}</span>
+                <span style="color: #0063a8; font-weight: bold; font-size: 20px;">${hours} hours</span>
               </div>
             `).join('')}
           </div>
           
           <!-- Total Hours -->
-          <div style="flex: 0 0 240px; background: linear-gradient(135deg, #0063a8 0%, #0e406a 100%); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 6px 12px rgba(0,99,168,0.2); display: flex; flex-direction: column; justify-content: center;">
-            <div style="color: white;">
-              <div style="font-size: 14px; margin-bottom: 6px; opacity: 0.9;">Total Recommended Hours</div>
+          <div style="flex: 0 0 240px; border: 3px solid #0063a8; border-radius: 12px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <div style="color: #0063a8;">
+              <div style="font-size: 14px; margin-bottom: 6px; font-weight: 600;">Total Recommended Hours</div>
               <div style="font-size: 36px; font-weight: bold; margin-bottom: 4px;">${totalHours}</div>
-              <div style="font-size: 16px; opacity: 0.9;">hours</div>
+              <div style="font-size: 16px; font-weight: 600;">hours</div>
             </div>
           </div>
         </div>
@@ -98,17 +98,14 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
             ${timeline.map(({ hoursPerWeek, months }, index) => {
               const maxMonths = Math.max(...timeline.map(t => t.months));
               const barWidth = (months / maxMonths) * 100;
-              const colors = ['#0063a8', '#f26a31', '#0e406a', '#f9c546'];
-              const color = colors[index % colors.length];
               return `
                 <div style="margin-bottom: 14px;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <span style="font-weight: bold; color: #1f2937; font-size: 14px;">${hoursPerWeek} hrs/week</span>
-                    <span style="font-weight: bold; color: ${color}; font-size: 14px;">${months} months</span>
+                    <span style="font-weight: bold; color: #0063a8; font-size: 14px;">${months} months</span>
                   </div>
                   <div style="background: #f1f5f9; border-radius: 16px; height: 20px; position: relative; overflow: hidden;">
-                    <div style="background: linear-gradient(90deg, ${color} 0%, ${color}CC 100%); height: 100%; width: ${barWidth}%; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                      <span style="color: white; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${months}m</span>
+                    <div style="background: #0063a8; height: 100%; width: ${barWidth}%; border-radius: 16px;">
                     </div>
                   </div>
                 </div>
@@ -137,7 +134,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setTextColor(242, 106, 49); // Orange color
   pdf.text('Flexible payment solutions designed for your budget', 20, 28);
 
-  let yPosition = 38;
+  let yPosition = 40;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
@@ -167,7 +164,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 6;
+  yPosition = (pdf as any).lastAutoTable.finalY + 18;
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
@@ -199,7 +196,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 6;
+  yPosition = (pdf as any).lastAutoTable.finalY + 18;
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
@@ -238,7 +235,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 4;
+  yPosition = (pdf as any).lastAutoTable.finalY + 12;
 
   // 18 Month Plan
   pdf.setFontSize(9);
