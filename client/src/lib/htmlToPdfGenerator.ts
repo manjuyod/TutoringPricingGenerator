@@ -2,6 +2,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
+import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
   hourlyRate: number;
@@ -47,7 +48,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="/attached_assets/TC Horizontal.png" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
+          <img src="${LOGO_B64}" alt="Tutoring Club Logo" style="height: 60px; width: auto;" crossOrigin="anonymous">
         </div>
       </div>
 
