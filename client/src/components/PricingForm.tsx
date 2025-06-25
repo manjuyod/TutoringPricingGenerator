@@ -126,7 +126,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="$50"
+                      placeholder="50"
                       {...field}
                       onChange={(e) => field.onChange(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)}
                       className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
