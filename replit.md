@@ -108,6 +108,7 @@ This is a full-stack web application built for Tutoring Club that generates pers
 
 ## Changelog
 - June 25, 2025. Initial setup
+- June 25, 2025. Fixed startup error by creating missing generatedAssets.ts file and integrated official Tutoring Club logo for PDF generation
 
 ## User Preferences
 
