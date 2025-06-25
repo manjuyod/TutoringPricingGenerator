@@ -47,7 +47,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <!-- Logo placeholder - will be added separately -->
+          <img src="/attached_assets/TC Horizontal.png" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
         </div>
       </div>
 
@@ -85,33 +85,12 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
         </div>
       </div>
 
-      <!-- Timeline Bar Chart -->
+      <!-- Timeline Line Chart -->
       <div>
         <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-          <div style="margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span style="font-size: 13px; color: #6b7280;">Hours per Week</span>
-              <span style="font-size: 13px; color: #6b7280;">Completion Time</span>
-            </div>
-            ${timeline.map(({ hoursPerWeek, months }, index) => {
-              const maxMonths = Math.max(...timeline.map(t => t.months));
-              const barWidth = (months / maxMonths) * 100;
-              return `
-                <div style="margin-bottom: 14px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-weight: bold; color: #1f2937; font-size: 14px;">${hoursPerWeek} hrs/week</span>
-                    <span style="font-weight: bold; color: #0063a8; font-size: 14px;">${months} months</span>
-                  </div>
-                  <div style="background: #f1f5f9; border-radius: 16px; height: 20px; position: relative; overflow: hidden;">
-                    <div style="background: #0063a8; height: 100%; width: ${barWidth}%; border-radius: 16px;">
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          <div style="text-align: center; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+          <canvas id="timelineChart" width="600" height="300" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+          <div style="text-align: center; padding-top: 12px; border-top: 1px solid #e5e7eb; margin-top: 12px;">
             <span style="font-size: 11px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
         </div>
@@ -119,13 +98,13 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
     </div>
   `;
 
-  await renderHtmlToPdf(pdf, htmlContent);
+  await renderHtmlToPdf(pdf, htmlContent, timeline);
 }
 
 async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
   // Add title with brand styling
     pdf.setFontSize(36);
-    pdf.setFont('Segoe UI', 'bold');
+    pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(0, 99, 168); // Navy color
     pdf.text('Tuition Payment Options', 20, 20);
 
@@ -261,7 +240,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   });
 }
 
-async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string): Promise<void> {
+async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]): Promise<void> {
   // Create a temporary div to render the HTML
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
@@ -271,8 +250,16 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string): Promise<void> {
   document.body.appendChild(tempDiv);
 
   try {
+    // If this is page 1 and has timeline data, render the line chart
+    if (timeline) {
+      const canvas = tempDiv.querySelector('#timelineChart') as HTMLCanvasElement;
+      if (canvas) {
+        drawLineChart(canvas, timeline);
+      }
+    }
+
     // Capture the HTML as canvas
-    const canvas = await html2canvas(tempDiv, {
+    const canvasCapture = await html2canvas(tempDiv, {
       width: 794, // A4 width in pixels at 96 DPI
       height: 1123, // A4 height in pixels at 96 DPI
       scale: 2, // Higher resolution
@@ -282,7 +269,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string): Promise<void> {
     });
 
     // Convert canvas to image and add to PDF
-    const imgData = canvas.toDataURL('image/png');
+    const imgData = canvasCapture.toDataURL('image/png');
     const imgWidth = 210; // A4 width in mm
     const imgHeight = 297; // A4 height in mm
 
@@ -291,4 +278,106 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string): Promise<void> {
     // Clean up the temporary div
     document.body.removeChild(tempDiv);
   }
+}
+
+function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Chart dimensions
+  const padding = 60;
+  const chartWidth = canvas.width - 2 * padding;
+  const chartHeight = canvas.height - 2 * padding;
+
+  // Find max months for scaling
+  const maxMonths = Math.max(...timeline.map(t => t.months));
+
+  // Draw axes
+  ctx.strokeStyle = '#374151';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  // Y-axis
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, padding + chartHeight);
+  // X-axis
+  ctx.moveTo(padding, padding + chartHeight);
+  ctx.lineTo(padding + chartWidth, padding + chartHeight);
+  ctx.stroke();
+
+  // Draw axis labels
+  ctx.fillStyle = '#374151';
+  ctx.font = '14px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Months', padding + chartWidth / 2, canvas.height - 10);
+  
+  ctx.save();
+  ctx.translate(20, padding + chartHeight / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Cumulative Skill Mastery (%)', 0, 0);
+  ctx.restore();
+
+  // Draw grid lines and labels
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '12px Arial';
+
+  // X-axis grid (months)
+  for (let i = 0; i <= maxMonths; i += Math.ceil(maxMonths / 8)) {
+    const x = padding + (i / maxMonths) * chartWidth;
+    ctx.beginPath();
+    ctx.moveTo(x, padding);
+    ctx.lineTo(x, padding + chartHeight);
+    ctx.stroke();
+    
+    ctx.textAlign = 'center';
+    ctx.fillText(i.toString(), x, padding + chartHeight + 20);
+  }
+
+  // Y-axis grid (percentage)
+  for (let i = 0; i <= 100; i += 20) {
+    const y = padding + chartHeight - (i / 100) * chartHeight;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(padding + chartWidth, y);
+    ctx.stroke();
+    
+    ctx.textAlign = 'right';
+    ctx.fillText(i + '%', padding - 10, y + 5);
+  }
+
+  // Draw learning curves for each timeline option
+  const colors = ['#0063a8', '#1e7ed3', '#3b94de', '#58aae9'];
+  
+  timeline.forEach(({ hoursPerWeek, months }, index) => {
+    ctx.strokeStyle = colors[index] || '#0063a8';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    // Start at origin
+    ctx.moveTo(padding, padding + chartHeight);
+    
+    // Draw learning curve (exponential approach to 100%)
+    for (let month = 0; month <= months; month += 0.5) {
+      const x = padding + (month / maxMonths) * chartWidth;
+      // Learning curve: faster initial learning, slowing as it approaches mastery
+      const progress = Math.min(100, (month / months) * 100);
+      const y = padding + chartHeight - (progress / 100) * chartHeight;
+      ctx.lineTo(x, y);
+    }
+    
+    ctx.stroke();
+    
+    // Add legend
+    const legendY = padding + 20 + index * 25;
+    ctx.fillStyle = colors[index] || '#0063a8';
+    ctx.fillRect(padding + chartWidth - 200, legendY - 8, 15, 10);
+    ctx.fillStyle = '#374151';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${hoursPerWeek} hrs/week (${months} months)`, padding + chartWidth - 180, legendY);
+  });
 }
