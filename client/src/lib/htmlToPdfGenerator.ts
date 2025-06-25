@@ -1,4 +1,3 @@
-
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -15,7 +14,7 @@ interface PdfFormData {
 
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
   const { hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
-  
+
   // Calculate all the data we need
   const totalHours = calculateTotalHours(subjects);
   const selectedSubjects = getSelectedSubjects(subjects);
@@ -25,14 +24,14 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
 
   const pdf = new jsPDF('p', 'mm', 'a4');
-  
+
   // Page 1: Academic Game Plan
   await generatePage1(pdf, selectedSubjects, totalHours, timeline);
-  
+
   // Page 2: Payment Options
   pdf.addPage();
   await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions);
-  
+
   // Save the PDF
   pdf.save('tutoring-club-academic-gameplan.pdf');
 }
@@ -48,7 +47,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="data:image/png;base64,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" alt="Tutoring Club Logo" style="height: 60px; width: auto;">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAEQCAYAAACeDyIpAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AUkSYqIQkQSoghodkVUcERRUUEG8igiAOOjoCMFVEsDIoK2AfkIaKOg6OIisr74Xuja9a89+bN/rXXPues852zzwfACAyWSDNRNYAMqUIeEeCDx8TG4eQuQIEKJHAAEAizZCFz/SMBAPh+PDwrIsAHvgABeNMLCADATZvAMByH/w/qQplcAYCEAcB0kThLCIAUAEB6jkKmAEBGAYCdmCZTAKAEAGDLY2LjAFAtAGAnf+bTAICd+Jl7AQBblCEVAaCRACATZYhEAGg7AKzPVopFAFgwABRmS8Q5ANgtADBJV2ZIALC3AMDOEAuyAAgMADBRiIUpAAR7AGDIIyN4AISZABRG8lc88SuuEOcqAAB4mbI8uSQ5RYFbCC1xB1dXLh4ozkkXKxQ2YQJhmkAuwnmZGTKBNA/g88wAAKCRFRHgg/P9eM4Ors7ONo62Dl8t6r8G/yJiYuP+5c+rcEAAAOF0ftH+LC+zGoA7BoBt/qIl7gRoXgugdfeLZrIPQLUAoOnaV/Nw+H48PEWhkLnZ2eXk5NhKxEJbYcpXff5nwl/AV/1s+X48/Pf14L7iJIEyXYFHBPjgwsz0TKUcz5IJhGLc5o9H/LcL//wd0yLESWK5WCoU41EScY5EmozzMqUiiUKSKcUl0v9k4t8s+wM+3zUAsGo+AXuRLahdYwP2SycQWHTA4vcAAPK7b8HUKAgDgGiD4c93/+8//UegJQCAZkmScQAAXkQkLlTKsz/HCAAARKCBKrBBG/TBGCzABhzBBdzBC/xgNoRCJMTCQhBCCmSAHHJgKayCQiiGzbAdKmAv1EAdNMBRaIaTcA4uwlW4Dj1wD/phCJ7BKLyBCQRByAgTYSHaiAFiilgjjggXmYX4IcFIBBKLJCDJiBRRIkuRNUgxUopUIFVIHfI9cgI5h1xGupE7yAAygvyGvEcxlIGyUT3UDLVDuag3GoRGogvQZHQxmo8WoJvQcrQaPYw2oefQq2gP2o8+Q8cwwOgYBzPEbDAuxsNCsTgsCZNjy7EirAyrxhqwVqwDu4n1Y8+xdwQSgUXACTYEd0IgYR5BSFhMWE7YSKggHCQ0EdoJNwkDhFHCJyKTqEu0JroR+cQYYjIxh1hILCPWEo8TLxB7iEPENyQSiUMyJ7mQAkmxpFTSEtJG0m5SI+ksqZs0SBojk8naZGuyBzmULCAryIXkneTD5DPkG+Qh8lsKnWJAcaT4U+IoUspqShnlEOU05QZlmDJBVaOaUt2ooVQRNY9aQq2htlKvUYeoEzR1mjnNgxZJS6WtopXTGmgXaPdpr+h0uhHdlR5Ol9BX0svpR+iX6AP0dwwNhhWDx4hnKBmbGAcYZxl3GK+YTKYZ04sZx1QwNzHrmOeZD5lvVVgqtip8FZHKCpVKlSaVGyovVKmqpqreqgtV81XLVI+pXlN9rkZVM1PjqQnUlqtVqp1Q61MbU2epO6iHqmeob1Q/pH5Z/YkGWcNMw09DpFGgsV/jvMYgC2MZs3gsIWsNq4Z1gTXEJrHN2Xx2KruY/R27iz2qqaE5QzNKM1ezUvOUZj8H45hx+Jx0TgnnKKeX836K3hTvKeIpG6Y0TLkxZVxrqpaXllirSKtRq0frvTau7aedpr1Fu1n7gQ5Bx0onXCdHZ4/OBZ3nU9lT3acKpxZNPTr1ri6qa6UbobtEd79up+6Ynr5egJ5Mb6feeb3n+hx9L/1U/W36p/VHDFgGswwkBtsMzhg8xTVxbzwdL8fb8VFDXcNAQ6VhlWGX4SU..." alt="Tutoring Club Logo" style="height: 60px; width: auto;">
         </div>
       </div>
 
@@ -74,7 +73,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
               </div>
             `).join('')}
           </div>
-          
+
           <!-- Total Hours -->
           <div style="flex: 0 0 240px; border: 3px solid #0063a8; border-radius: 12px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
             <div style="color: #0063a8;">
@@ -86,31 +85,35 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
         </div>
       </div>
 
-      <!-- Timeline Bar Chart -->
+      <!-- Timeline Line Chart -->
       <div>
         <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
           <div style="margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span style="font-size: 13px; color: #6b7280;">Hours per Week</span>
-              <span style="font-size: 13px; color: #6b7280;">Completion Time</span>
-            </div>
-            ${timeline.map(({ hoursPerWeek, months }, index) => {
-              const maxMonths = Math.max(...timeline.map(t => t.months));
-              const barWidth = (months / maxMonths) * 100;
-              return `
-                <div style="margin-bottom: 14px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-weight: bold; color: #1f2937; font-size: 14px;">${hoursPerWeek} hrs/week</span>
-                    <span style="font-weight: bold; color: #0063a8; font-size: 14px;">${months} months</span>
-                  </div>
-                  <div style="background: #f1f5f9; border-radius: 16px; height: 20px; position: relative; overflow: hidden;">
-                    <div style="background: #0063a8; height: 100%; width: ${barWidth}%; border-radius: 16px;">
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
+            <!-- Line Chart -->
+            <svg width="100%" height="200">
+              ${timeline.map(({ hoursPerWeek, months }, index) => {
+                // Define start and end points for the learning curve lines
+                const startX = 0;
+                const startY = 150; // Start from the bottom of the chart
+
+                const endX = months / Math.max(...timeline.map(t => t.months)) * 400; // Scale months to fit the chart width
+                const endY = 50; // End at the top of the chart
+
+                return `
+                  <line
+                    x1="${startX}" y1="${startY}"
+                    x2="${endX}" y2="${endY}"
+                    stroke="#0063a8" stroke-width="2"
+                  />
+                  <text x="${endX + 5}" y="${endY + 5}" font-size="10" fill="#6b7280">${months} Months</text>
+                  <text x="${startX + 5}" y="${startY + 5}" font-size="10" fill="#6b7280">${hoursPerWeek} hrs/week</text>
+                `;
+              }).join('')}
+              <!-- Dashed goal line -->
+              <line x1="0" y1="50" x2="400" y2="50" stroke="#f26a31" stroke-width="1" stroke-dasharray="5,5"/>
+              <text x="5" y="40" font-size="10" fill="#f26a31">Goal</text>
+            </svg>
           </div>
           <div style="text-align: center; padding-top: 12px; border-top: 1px solid #e5e7eb;">
             <span style="font-size: 11px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
@@ -125,12 +128,12 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
 async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
   // Add title with brand styling
-  pdf.setFontSize(20);
-  pdf.setTextColor(14, 64, 106); // Navy color
+  pdf.setFontSize(36); // match the font size from the first page
+  pdf.setTextColor(0, 99, 168); // Navy color
   pdf.text('Tuition Payment Options', 20, 20);
-  
-  // Add subtitle
-  pdf.setFontSize(10);
+
+    // Add subtitle
+  pdf.setFontSize(20); // match the font size from the first page
   pdf.setTextColor(242, 106, 49); // Orange color
   pdf.text('Flexible payment solutions designed for your budget', 20, 28);
 
@@ -139,7 +142,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
   pdf.rect(15, yPosition - 2, 180, 18, 'F');
-  
+
   pdf.setFontSize(11);
   pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
@@ -147,8 +150,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Pay as you go monthly. Testing fee: $75. Registration fee: $100.', 20, yPosition);
-  yPosition += 4;
+  pdf.text('Pay as you go monthly. Testing fee: $75. Registration fee: $100.', 20, yPosition + 8); // Added spacing here
+  yPosition += 12; // Increased spacing here
 
   autoTable(pdf, {
     startY: yPosition,
@@ -169,7 +172,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
   pdf.rect(15, yPosition - 2, 180, 18, 'F');
-  
+
   pdf.setFontSize(11);
   pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
@@ -177,8 +180,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition);
-  yPosition += 4;
+  pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition + 8); // Added spacing here
+  yPosition += 12; // Increased spacing here
 
   autoTable(pdf, {
     startY: yPosition,
@@ -201,7 +204,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
   pdf.rect(15, yPosition - 2, 180, 22, 'F');
-  
+
   pdf.setFontSize(11);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
@@ -209,8 +212,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition);
-  yPosition += 6;
+  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition + 8); // Added spacing here
+  yPosition += 12; // Increased spacing here
 
   // 12 Month Plan
   pdf.setFontSize(9);
@@ -285,7 +288,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string): Promise<void> {
     const imgData = canvas.toDataURL('image/png');
     const imgWidth = 210; // A4 width in mm
     const imgHeight = 297; // A4 height in mm
-    
+
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
   } finally {
     // Clean up the temporary div
