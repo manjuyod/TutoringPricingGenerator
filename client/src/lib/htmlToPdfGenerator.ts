@@ -62,7 +62,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Recommended Sessions with Total Hours -->
       <div style="margin-bottom: 25px;">
-        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
         <div style="display: flex; gap: 24px;">
           <!-- Subjects List -->
           <div style="flex: 1; padding: 20px;">
@@ -87,9 +87,9 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Timeline Line Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 12px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 12px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
-          <canvas id="timelineChart" width="600" height="240" style="width: 100%; max-width: 600px; height: 240px; display: block; margin: 0 auto;"></canvas>
+          <canvas id="timelineChart" width="700" height="280" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;"></canvas>
           <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
             <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
@@ -134,12 +134,12 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     head: [['Hours/Week', 'Monthly Cost', 'Hourly Rate']],
     body: monthlyOptions.map(({ hoursPerWeek, monthlyCost, hourlyRate }) => [
       hoursPerWeek.toString(),
-      `$${monthlyCost.toFixed(2)}`,
+      `$${Math.round(monthlyCost)}`,
       `$${hourlyRate.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [0, 99, 168], textColor: 255 },
+    styles: { fontSize: 10, cellPadding: 3, halign: 'center' },
+    headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 
@@ -165,13 +165,13 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     body: prepayOptions.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, savings }) => [
       hours.toString(),
       `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${totalCost.toFixed(2)}`,
+      `$${Math.round(totalCost)}`,
       `${discountPercent}%`,
-      `$${savings.toFixed(2)}`
+      `$${Math.round(savings)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [242, 106, 49], textColor: 255 }, // Brand orange header
+    styles: { fontSize: 10, cellPadding: 3, halign: 'center' },
+    headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: 'center' }, // Brand orange header
     margin: { left: 20, right: 20 }
   });
 
@@ -203,14 +203,14 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     body: financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
       hours.toString(),
       `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${totalCost.toFixed(2)}`,
+      `$${Math.round(totalCost)}`,
       `${discountPercent}%`,
-      `$${monthlyCost.toFixed(2)}`,
-      `$${savings.toFixed(2)}`
+      `$${Math.round(monthlyCost)}`,
+      `$${Math.round(savings)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 7, cellPadding: 1.5 },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0] }, // Brand yellow header
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header
     margin: { left: 20, right: 20 }
   });
 
@@ -228,14 +228,14 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     body: financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
       hours.toString(),
       `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${totalCost.toFixed(2)}`,
+      `$${Math.round(totalCost)}`,
       `${discountPercent}%`,
-      `$${monthlyCost.toFixed(2)}`,
-      `$${savings.toFixed(2)}`
+      `$${Math.round(monthlyCost)}`,
+      `$${Math.round(savings)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 7, cellPadding: 1.5 },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0] }, // Brand yellow header with black text for readability
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header with black text for readability
     margin: { left: 20, right: 20 }
   });
 }
@@ -287,11 +287,11 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Chart dimensions - leave space for legend on right and Y-axis label on left
+  // Chart dimensions - balanced spacing for legend and Y-axis label
   const padding = 60;
-  const leftPadding = 80; // Extra space for Y-axis label
-  const legendWidth = 180;
-  const chartWidth = canvas.width - leftPadding - padding - legendWidth;
+  const leftPadding = 120; // Space for Y-axis label
+  const rightPadding = 120; // Equal space for legend
+  const chartWidth = canvas.width - leftPadding - rightPadding;
   const chartHeight = canvas.height - 2 * padding;
 
   // Find max months for scaling
@@ -316,7 +316,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   ctx.fillText('Months', leftPadding + chartWidth / 2, canvas.height - 10);
   
   ctx.save();
-  ctx.translate(25, padding + chartHeight / 2);
+  ctx.translate(30, padding + chartHeight / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.fillText('Cumulative Skill Mastery (%)', 0, 0);
   ctx.restore();
@@ -348,11 +348,11 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.stroke();
     
     ctx.textAlign = 'right';
-    ctx.fillText(i + '%', leftPadding - 15, y + 5);
+    ctx.fillText(i + '%', leftPadding - 20, y + 5);
   }
 
   // Draw learning curves for each timeline option
-  const colors = ['#0063a8', '#1e7ed3', '#3b94de', '#58aae9'];
+  const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
   
   timeline.forEach(({ hoursPerWeek, months }, index) => {
     ctx.strokeStyle = colors[index] || '#0063a8';
@@ -376,7 +376,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     // Add legend on the right side
     const legendX = leftPadding + chartWidth + 20;
     const legendY = padding + 30 + index * 25;
-    ctx.fillStyle = colors[index] || '#0063a8';
+    ctx.fillStyle = colors[index] || '#f26a31';
     ctx.fillRect(legendX, legendY - 8, 15, 10);
     ctx.fillStyle = '#374151';
     ctx.font = '11px Arial';
