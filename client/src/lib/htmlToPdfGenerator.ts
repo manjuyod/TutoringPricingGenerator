@@ -88,9 +88,9 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       <!-- Timeline Line Chart -->
       <div>
         <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 12px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
-        <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-          <canvas id="timelineChart" width="600" height="240" style="width: 100%; max-width: 600px; height: 240px;"></canvas>
-          <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px;">
+        <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
+          <canvas id="timelineChart" width="600" height="240" style="width: 100%; max-width: 600px; height: 240px; display: block; margin: 0 auto;"></canvas>
+          <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
             <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
         </div>
@@ -287,10 +287,11 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Chart dimensions - leave space for legend on right
+  // Chart dimensions - leave space for legend on right and Y-axis label on left
   const padding = 60;
+  const leftPadding = 80; // Extra space for Y-axis label
   const legendWidth = 180;
-  const chartWidth = canvas.width - 2 * padding - legendWidth;
+  const chartWidth = canvas.width - leftPadding - padding - legendWidth;
   const chartHeight = canvas.height - 2 * padding;
 
   // Find max months for scaling
@@ -301,21 +302,21 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   ctx.lineWidth = 2;
   ctx.beginPath();
   // Y-axis
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, padding + chartHeight);
+  ctx.moveTo(leftPadding, padding);
+  ctx.lineTo(leftPadding, padding + chartHeight);
   // X-axis
-  ctx.moveTo(padding, padding + chartHeight);
-  ctx.lineTo(padding + chartWidth, padding + chartHeight);
+  ctx.moveTo(leftPadding, padding + chartHeight);
+  ctx.lineTo(leftPadding + chartWidth, padding + chartHeight);
   ctx.stroke();
 
   // Draw axis labels
   ctx.fillStyle = '#374151';
   ctx.font = '14px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Months', padding + chartWidth / 2, canvas.height - 10);
+  ctx.fillText('Months', leftPadding + chartWidth / 2, canvas.height - 10);
   
   ctx.save();
-  ctx.translate(20, padding + chartHeight / 2);
+  ctx.translate(25, padding + chartHeight / 2);
   ctx.rotate(-Math.PI / 2);
   ctx.fillText('Cumulative Skill Mastery (%)', 0, 0);
   ctx.restore();
@@ -328,7 +329,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
 
   // X-axis grid (months)
   for (let i = 0; i <= maxMonths; i += Math.ceil(maxMonths / 8)) {
-    const x = padding + (i / maxMonths) * chartWidth;
+    const x = leftPadding + (i / maxMonths) * chartWidth;
     ctx.beginPath();
     ctx.moveTo(x, padding);
     ctx.lineTo(x, padding + chartHeight);
@@ -342,12 +343,12 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   for (let i = 0; i <= 100; i += 20) {
     const y = padding + chartHeight - (i / 100) * chartHeight;
     ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(padding + chartWidth, y);
+    ctx.moveTo(leftPadding, y);
+    ctx.lineTo(leftPadding + chartWidth, y);
     ctx.stroke();
     
     ctx.textAlign = 'right';
-    ctx.fillText(i + '%', padding - 10, y + 5);
+    ctx.fillText(i + '%', leftPadding - 15, y + 5);
   }
 
   // Draw learning curves for each timeline option
@@ -359,11 +360,11 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.beginPath();
     
     // Start at origin
-    ctx.moveTo(padding, padding + chartHeight);
+    ctx.moveTo(leftPadding, padding + chartHeight);
     
     // Draw learning curve (exponential approach to 100%)
     for (let month = 0; month <= months; month += 0.5) {
-      const x = padding + (month / maxMonths) * chartWidth;
+      const x = leftPadding + (month / maxMonths) * chartWidth;
       // Learning curve: faster initial learning, slowing as it approaches mastery
       const progress = Math.min(100, (month / months) * 100);
       const y = padding + chartHeight - (progress / 100) * chartHeight;
@@ -373,7 +374,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.stroke();
     
     // Add legend on the right side
-    const legendX = padding + chartWidth + 20;
+    const legendX = leftPadding + chartWidth + 20;
     const legendY = padding + 30 + index * 25;
     ctx.fillStyle = colors[index] || '#0063a8';
     ctx.fillRect(legendX, legendY - 8, 15, 10);
