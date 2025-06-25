@@ -47,7 +47,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="/attached_assets/TC Horizontal.png" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
+          <img src="${window.location.origin}/attached_assets/TC Horizontal.png" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
         </div>
       </div>
 
