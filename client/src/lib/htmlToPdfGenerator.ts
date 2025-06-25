@@ -61,8 +61,8 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       </div>
 
       <!-- Recommended Sessions with Total Hours -->
-      <div style="margin-bottom: 25px;">
-        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
+      <div style="margin-bottom: 30px;">
+        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 21px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
         <div style="display: flex; gap: 24px;">
           <!-- Subjects List -->
           <div style="flex: 1; padding: 20px;">
@@ -76,10 +76,10 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
           <!-- Total Hours -->
           <div style="flex: 0 0 240px; border: 3px solid #0063a8; border-radius: 12px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
-            <div style="color: #0063a8;">
-              <div style="font-size: 14px; margin-bottom: 6px; font-weight: 600;">Total Recommended Hours</div>
-              <div style="font-size: 36px; font-weight: bold; margin-bottom: 4px;">${totalHours}</div>
-              <div style="font-size: 16px; font-weight: 600;">hours</div>
+            <div>
+              <div style="font-size: 14px; margin-bottom: 6px; font-weight: 600; color: #0063a8;">Total Recommended Hours</div>
+              <div style="font-size: 36px; font-weight: bold; margin-bottom: 4px; color: #f26a31;">${totalHours}</div>
+              <div style="font-size: 16px; font-weight: 600; color: #f26a31;">hours</div>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Timeline Line Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 12px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Timeline Options</h3>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
           <canvas id="timelineChart" width="700" height="280" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;"></canvas>
           <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
@@ -117,9 +117,9 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
-  pdf.rect(15, yPosition - 2, 180, 18, 'F');
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
-  pdf.setFontSize(11);
+  pdf.setFontSize(9);
   pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
   yPosition += 6;
@@ -138,18 +138,18 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
       `$${hourlyRate.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 3, halign: 'center' },
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 18;
+  yPosition = (pdf as any).lastAutoTable.finalY + 14;
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
-  pdf.rect(15, yPosition - 2, 180, 18, 'F');
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
-  pdf.setFontSize(11);
+  pdf.setFontSize(9);
   pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
   yPosition += 6;
@@ -170,18 +170,18 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
       `$${Math.round(savings)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 3, halign: 'center' },
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: 'center' }, // Brand orange header
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 18;
+  yPosition = (pdf as any).lastAutoTable.finalY + 14;
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 2, 180, 22, 'F');
+  pdf.rect(15, yPosition - 2, 180, 20, 'F');
 
-  pdf.setFontSize(11);
+  pdf.setFontSize(9);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
   yPosition += 6;
@@ -214,7 +214,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 12;
+  yPosition = (pdf as any).lastAutoTable.finalY + 10;
 
   // 18 Month Plan
   pdf.setFontSize(9);
@@ -381,6 +381,6 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.fillStyle = '#374151';
     ctx.font = '11px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText(`${hoursPerWeek} hrs/week (${months} months)`, legendX + 20, legendY);
+    ctx.fillText(`${hoursPerWeek} hrs/week`, legendX + 20, legendY);
   });
 }
