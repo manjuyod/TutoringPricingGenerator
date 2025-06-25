@@ -37,6 +37,9 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 }
 
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[]) {
+  // Convert logo to base64
+  const logoBase64 = await convertImageToBase64(`${window.location.origin}/attached_assets/TC Horizontal.png`);
+  
   // Create HTML content for page 1
   const htmlContent = `
     <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
@@ -47,7 +50,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
           <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="${window.location.origin}/attached_assets/TC Horizontal.png" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
+          <img src="${logoBase64}" alt="Tutoring Club Logo" style="height: 60px; width: auto;" onError="this.style.display='none'">
         </div>
       </div>
 
@@ -277,6 +280,21 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
   } finally {
     // Clean up the temporary div
     document.body.removeChild(tempDiv);
+  }
+}
+
+async function convertImageToBase64(imageUrl: string): Promise<string> {
+  try {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Failed to convert image to base64:', error);
+    return ''; // Return empty string if image fails to load
   }
 }
 
