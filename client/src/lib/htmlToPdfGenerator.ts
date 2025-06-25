@@ -62,7 +62,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Recommended Sessions with Total Hours -->
       <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 21px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 21px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Sessions by Subject</h3>
         <div style="display: flex; gap: 24px;">
           <!-- Subjects List -->
           <div style="flex: 1; padding: 20px;">
@@ -87,7 +87,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Timeline Line Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 6px;">Recommended Timeline Options</h3>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
           <canvas id="timelineChart" width="700" height="280" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;"></canvas>
           <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
@@ -119,7 +119,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
   pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
-  pdf.setFontSize(9);
+  pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
   yPosition += 6;
@@ -149,7 +149,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
   pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
-  pdf.setFontSize(9);
+  pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
   yPosition += 6;
@@ -181,7 +181,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
   pdf.rect(15, yPosition - 2, 180, 20, 'F');
 
-  pdf.setFontSize(9);
+  pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
   yPosition += 6;
