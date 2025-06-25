@@ -52,7 +52,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       </div>
 
       <!-- Description -->
-      <div style="margin-bottom: 40px; background: #f8fafc; border-left: 4px solid #f26a31; padding: 24px; border-radius: 8px;">
+      <div style="margin-bottom: 30px; background: #f8fafc; border-left: 4px solid #0063a8; padding: 20px; border-radius: 8px;">
         <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0; font-style: italic;">
           At Tutoring Club, we believe every student has the potential to thrive—with the right support. 
           Based on your academic goals and our in-depth assessment, we've put together a customized roadmap 
@@ -61,8 +61,8 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       </div>
 
       <!-- Recommended Sessions with Total Hours -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 24px; font-weight: bold; color: #0e406a; margin: 0 0 20px 0; border-bottom: 3px solid #f26a31; padding-bottom: 8px;">Recommended Sessions by Subject</h3>
+      <div style="margin-bottom: 25px;">
+        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Sessions by Subject</h3>
         <div style="display: flex; gap: 24px;">
           <!-- Subjects List -->
           <div style="flex: 1; padding: 20px;">
@@ -87,11 +87,11 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Timeline Line Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 16px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
-        <div style="background: white; border-radius: 12px; padding: 20px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-          <canvas id="timelineChart" width="600" height="300" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-          <div style="text-align: center; padding-top: 12px; border-top: 1px solid #e5e7eb; margin-top: 12px;">
-            <span style="font-size: 11px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
+        <h3 style="font-size: 20px; font-weight: bold; color: #0e406a; margin: 0 0 12px 0; border-bottom: 3px solid #f26a31; padding-bottom: 6px;">Recommended Timeline Options</h3>
+        <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <canvas id="timelineChart" width="600" height="240" style="width: 100%; max-width: 600px; height: 240px;"></canvas>
+          <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px;">
+            <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
         </div>
       </div>
@@ -103,7 +103,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
 async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
   // Add title with brand styling
-    pdf.setFontSize(36);
+    pdf.setFontSize(30);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(0, 99, 168); // Navy color
     pdf.text('Tuition Payment Options', 20, 20);
@@ -126,7 +126,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('Pay as you go monthly. Testing fee: $75. Registration fee: $100.', 20, yPosition);
+  pdf.text('Pay as you go monthly. Testing fee: $75. Materials fee: $100.', 20, yPosition);
   yPosition += 4;
 
   autoTable(pdf, {
@@ -188,7 +188,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. On approved credit.', 20, yPosition);
+  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
   yPosition += 6;
 
   // 12 Month Plan
@@ -287,9 +287,10 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Chart dimensions
+  // Chart dimensions - leave space for legend on right
   const padding = 60;
-  const chartWidth = canvas.width - 2 * padding;
+  const legendWidth = 180;
+  const chartWidth = canvas.width - 2 * padding - legendWidth;
   const chartHeight = canvas.height - 2 * padding;
 
   // Find max months for scaling
@@ -371,13 +372,14 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     
     ctx.stroke();
     
-    // Add legend
-    const legendY = padding + 20 + index * 25;
+    // Add legend on the right side
+    const legendX = padding + chartWidth + 20;
+    const legendY = padding + 30 + index * 25;
     ctx.fillStyle = colors[index] || '#0063a8';
-    ctx.fillRect(padding + chartWidth - 200, legendY - 8, 15, 10);
+    ctx.fillRect(legendX, legendY - 8, 15, 10);
     ctx.fillStyle = '#374151';
-    ctx.font = '12px Arial';
+    ctx.font = '11px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText(`${hoursPerWeek} hrs/week (${months} months)`, padding + chartWidth - 180, legendY);
+    ctx.fillText(`${hoursPerWeek} hrs/week (${months} months)`, legendX + 20, legendY);
   });
 }
