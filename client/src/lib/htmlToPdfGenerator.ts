@@ -122,7 +122,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
-  yPosition += 6;
+  yPosition += 13;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
@@ -152,7 +152,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
-  yPosition += 6;
+  yPosition += 13;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
@@ -184,7 +184,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
-  yPosition += 6;
+  yPosition += 13;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
@@ -314,7 +314,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   ctx.font = '14px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('Months', leftPadding + chartWidth / 2, canvas.height - 10);
-  
+
   ctx.save();
   ctx.translate(30, padding + chartHeight / 2);
   ctx.rotate(-Math.PI / 2);
@@ -334,7 +334,7 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.moveTo(x, padding);
     ctx.lineTo(x, padding + chartHeight);
     ctx.stroke();
-    
+
     ctx.textAlign = 'center';
     ctx.fillText(i.toString(), x, padding + chartHeight + 20);
   }
@@ -346,22 +346,22 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.moveTo(leftPadding, y);
     ctx.lineTo(leftPadding + chartWidth, y);
     ctx.stroke();
-    
+
     ctx.textAlign = 'right';
     ctx.fillText(i + '%', leftPadding - 20, y + 5);
   }
 
   // Draw learning curves for each timeline option
   const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
-  
+
   timeline.forEach(({ hoursPerWeek, months }, index) => {
     ctx.strokeStyle = colors[index] || '#0063a8';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    
+
     // Start at origin
     ctx.moveTo(leftPadding, padding + chartHeight);
-    
+
     // Draw learning curve (exponential approach to 100%)
     for (let month = 0; month <= months; month += 0.5) {
       const x = leftPadding + (month / maxMonths) * chartWidth;
@@ -370,9 +370,9 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
       const y = padding + chartHeight - (progress / 100) * chartHeight;
       ctx.lineTo(x, y);
     }
-    
+
     ctx.stroke();
-    
+
     // Add legend on the right side
     const legendX = leftPadding + chartWidth + 20;
     const legendY = padding + 30 + index * 25;
