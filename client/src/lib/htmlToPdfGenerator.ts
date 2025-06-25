@@ -122,7 +122,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
   pdf.text('Monthly Tuition Option', 20, yPosition + 3);
-  yPosition += 13;
+  yPosition += 8;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
@@ -152,7 +152,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange
   pdf.text('Prepay Tuition Option', 20, yPosition + 3);
-  yPosition += 13;
+  yPosition += 8;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
@@ -184,7 +184,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
-  yPosition += 13;
+  yPosition += 8;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
