@@ -40,7 +40,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string) {
   // Create HTML content for page 1
   const htmlContent = `
-    <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
+    <div style="max-width: 794px; margin: 0 auto; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-bottom: 3px solid #0063a8;">
         <div>
@@ -261,7 +261,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
 
     const totalMonths = Math.ceil(maxWeeks / 4.33);
     const maxLabels = 6;
-    
+
     if (totalMonths <= maxLabels) {
       // Show all months if 6 or fewer
       while (current <= endDate) {
@@ -272,7 +272,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
       // Show every nth month to fit in 6 labels
       const step = Math.ceil(totalMonths / maxLabels);
       let monthCount = 0;
-      
+
       while (current <= endDate && labels.length < maxLabels) {
         if (monthCount % step === 0) {
           labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
@@ -281,7 +281,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
         monthCount++;
       }
     }
-    
+
     return labels;
   };
 
