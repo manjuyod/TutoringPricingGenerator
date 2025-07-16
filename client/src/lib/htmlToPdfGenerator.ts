@@ -294,8 +294,13 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     };
   });
 
-  // Create timeline HTML
-  const timelineHtml = `
+  // Create timeline chart as separate element for rasterization
+  const chartDiv = document.createElement('div');
+  chartDiv.style.width = '400px'; // Fixed width for chart (2/3 of ~600px content area)
+  chartDiv.style.padding = '20px';
+  chartDiv.style.backgroundColor = 'white';
+  chartDiv.style.fontFamily = "'Segoe UI', Arial, sans-serif";
+  chartDiv.innerHTML = `
     <div style="margin-bottom: 12px;">
       ${barData.map((bar, index) => `
         <div style="margin-bottom: 7px;">
@@ -319,13 +324,35 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     </div>
   `;
 
+  // Add chart element to body temporarily for rendering
+  chartDiv.style.position = 'absolute';
+  chartDiv.style.left = '-10000px';
+  document.body.appendChild(chartDiv);
+
+  // Capture chart as canvas
+  const canvas = await html2canvas(chartDiv, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: 'white',
+    width: 400,
+    height: 160
+  });
+
+  // Convert canvas to image data
+  const chartImageData = canvas.toDataURL('image/png');
+
+  // Remove chart element
+  document.body.removeChild(chartDiv);
+
+  // Create main content without timeline
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   document.body.appendChild(tempDiv);
 
+  // Replace timeline chart placeholder with image
   const timelineChartElement = tempDiv.querySelector('#timelineChart') as HTMLElement;
   if (timelineChartElement) {
-    timelineChartElement.innerHTML = timelineHtml;
+    timelineChartElement.innerHTML = `<img src="${chartImageData}" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto;" crossOrigin="anonymous">`;
   }
 
   await pdf.html(tempDiv, {
@@ -338,7 +365,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     width: 190,
     windowWidth: 650,
     html2canvas: {
-      scale: 0.4,
+      scale: 0.5,
       useCORS: true,
       letterRendering: true,
     }
