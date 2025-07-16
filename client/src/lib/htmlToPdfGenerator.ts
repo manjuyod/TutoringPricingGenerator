@@ -484,12 +484,6 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
     ctx.font = '14px Arial';
     ctx.textAlign = 'right';
     ctx.fillText(`${hoursPerWeek}h/week`, leftPadding - 10, barY + barHeight / 2 + 5);
-
-    // Add extended label on the right
-    ctx.fillStyle = '#374151';
-    ctx.font = '11px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(`(${hoursPerWeek} hours weekly)`, leftPadding + barWidth + 10, barY + barHeight / 2 + 4);
   });
 
   // Add axis labels
