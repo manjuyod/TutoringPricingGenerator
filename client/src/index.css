@@ -73,6 +73,47 @@
     color: hsl(var(--tc-orange));
   }
   
+
+
+/* Section Isolation Styles */
+.isolated-section {
+  contain: layout style;
+  isolation: isolate;
+  position: relative;
+}
+
+.pricing-form-container {
+  container-type: inline-size;
+  container-name: form-section;
+}
+
+.preview-container {
+  container-type: inline-size;
+  container-name: preview-section;
+}
+
+/* Prevent cross-section interference */
+.isolated-section * {
+  box-sizing: border-box;
+}
+
+/* Section-specific scoping */
+[data-section="pricing-form"] {
+  --section-primary: theme('colors.tc-blue');
+  --section-secondary: theme('colors.tc-orange');
+}
+
+[data-section="live-preview"] {
+  --section-primary: theme('colors.gray.900');
+  --section-secondary: theme('colors.gray.600');
+}
+
+/* PDF Generator isolation */
+.pdf-generator-container {
+  contain: layout style;
+  isolation: isolate;
+}
+
   .bg-tc-blue {
     background-color: hsl(var(--tc-blue));
   }
