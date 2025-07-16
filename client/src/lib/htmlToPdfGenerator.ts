@@ -253,16 +253,29 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
   const endDate = new Date(currentDate);
   endDate.setDate(endDate.getDate() + (maxWeeks * 7));
 
-  // Generate month labels for timeline
+  // Generate month labels for timeline (max 6 months)
   const generateMonthLabels = () => {
     const labels = [];
     const current = new Date(currentDate);
     current.setDate(1); // Start at first of month
-
-    while (current <= endDate) {
-      labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-      current.setMonth(current.getMonth() + 1);
+    
+    const totalMonths = Math.ceil(maxWeeks / 4.33);
+    
+    if (totalMonths <= 6) {
+      // Show all months if 6 or fewer
+      while (current <= endDate) {
+        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+        current.setMonth(current.getMonth() + 1);
+      }
+    } else {
+      // Show 6 evenly spaced months
+      const monthInterval = Math.ceil(totalMonths / 6);
+      for (let i = 0; i < 6; i++) {
+        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+        current.setMonth(current.getMonth() + monthInterval);
+      }
     }
+    
     return labels;
   };
 
