@@ -13,6 +13,101 @@ interface PdfFormData {
   interestDiscounts: Record<string, number>;
 }
 
+// Function to create and rasterize the timeline chart
+async function createTimelineChart(totalHours: number, weeklyHoursRange: string): Promise<string> {
+  // Parse the weekly hours range
+  const hoursOptions = weeklyHoursRange.includes('-') 
+    ? weeklyHoursRange.split('-').map(h => parseInt(h.trim()))
+    : [parseInt(weeklyHoursRange)];
+  
+  const minHours = Math.min(...hoursOptions);
+  const maxHours = Math.max(...hoursOptions);
+  const hoursArray = hoursOptions.length === 2 
+    ? [minHours, Math.ceil((minHours + maxHours) / 2), maxHours]
+    : hoursOptions;
+
+  // Calculate timeline data
+  const maxWeeks = Math.ceil(totalHours / Math.min(...hoursArray));
+  const generateMonthLabels = () => {
+    const labels = [];
+    const current = new Date();
+    const monthInterval = Math.max(1, Math.floor(maxWeeks / 12));
+    
+    for (let i = 0; i < 6; i++) {
+      labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+      current.setMonth(current.getMonth() + monthInterval);
+    }
+    return labels;
+  };
+
+  const monthLabels = generateMonthLabels();
+  const barData = hoursArray.map(hoursPerWeek => {
+    const weeks = Math.ceil(totalHours / hoursPerWeek);
+    const widthPercent = (weeks / maxWeeks) * 100;
+    return {
+      hoursPerWeek,
+      weeks,
+      widthPercent,
+      months: Math.ceil(weeks / 4.33)
+    };
+  });
+
+  // Create a temporary container for the chart
+  const chartContainer = document.createElement('div');
+  chartContainer.style.width = '400px';
+  chartContainer.style.height = '120px';
+  chartContainer.style.padding = '16px';
+  chartContainer.style.backgroundColor = 'white';
+  chartContainer.style.fontFamily = 'Arial, sans-serif';
+  chartContainer.style.position = 'absolute';
+  chartContainer.style.top = '-10000px';
+  chartContainer.style.left = '-10000px';
+
+  chartContainer.innerHTML = `
+    <div style="margin-bottom: 8px;">
+      ${barData.map((bar, index) => `
+        <div style="margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; margin-bottom: 2px;">
+            <span style="font-weight: 600; color: #374151; width: 70px; font-size: 11px;">${bar.hoursPerWeek}h/week</span>
+            <span style="font-size: 10px; color: #6b7280; margin-left: 6px;">${bar.weeks} weeks (${bar.months} months)</span>
+          </div>
+          <div style="height: 18px; background-color: #f3f4f6; border-radius: 4px; position: relative; overflow: hidden;">
+            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; color: white; font-size: 9px; font-weight: 600;">
+              ${bar.weeks}w
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="position: relative; margin-top: 8px;">
+      <div style="height: 3px; background-color: #e5e7eb; border-radius: 2px; margin-bottom: 4px;"></div>
+      <div style="display: flex; justify-content: space-between; font-size: 8px; color: #6b7280;">
+        ${monthLabels.map(label => `<span>${label}</span>`).join('')}
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(chartContainer);
+
+  try {
+    // Render the chart as an image
+    const canvas = await html2canvas(chartContainer, {
+      width: 400,
+      height: 120,
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // Convert to base64
+    const imageData = canvas.toDataURL('image/png');
+    return imageData;
+  } finally {
+    // Clean up
+    document.body.removeChild(chartContainer);
+  }
+}
+
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
   const { hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
 
@@ -24,10 +119,13 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
   const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
 
+  // Pre-render the timeline chart as an image
+  const chartImage = await createTimelineChart(totalHours, weeklyHours);
+
   const pdf = new jsPDF('p', 'mm', 'a4');
 
   // Page 1: Academic Game Plan
-  await generatePage1(pdf, selectedSubjects, totalHours, timeline, weeklyHours);
+  await generatePage1(pdf, selectedSubjects, totalHours, timeline, weeklyHours, chartImage);
 
   // Page 2: Payment Options
   pdf.addPage();
@@ -37,7 +135,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   pdf.save('tutoring-club-academic-gameplan.pdf');
 }
 
-async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string) {
+async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string, chartImage: string) {
   // Create HTML content for page 1
   const htmlContent = `
     <div style="width: 794px; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
@@ -90,9 +188,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       <div>
         <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
-          <div style="width: 500px; height: 140px; overflow: hidden; position: relative; background: white; border-radius: 8px;">
-            <div id="timelineChart" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; transform: scale(1); transform-origin: top left;"></div>
-          </div>
+          <img src="${chartImage}" alt="Timeline Chart" style="width: 400px; height: 120px; border-radius: 8px;" />
           <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
             <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
@@ -244,93 +340,9 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 }
 
 async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[], totalHours: number, weeklyHoursRange: string) {
-  const hoursOptions = weeklyHoursRange === "2-8" ? [2, 4, 6, 8] : [4, 8, 12, 16];
-  const currentDate = new Date();
-
-  // Calculate timeline bounds
-  const minWeeks = Math.ceil(totalHours / Math.max(...hoursOptions));
-  const maxWeeks = Math.ceil(totalHours / Math.min(...hoursOptions));
-
-  // Calculate end date for timeline
-  const endDate = new Date(currentDate);
-  endDate.setDate(endDate.getDate() + (maxWeeks * 7));
-
-  // Generate month labels for timeline (max 6 months)
-  const generateMonthLabels = () => {
-    const labels = [];
-    const current = new Date(currentDate);
-    current.setDate(1); // Start at first of month
-    
-    const totalMonths = Math.ceil(maxWeeks / 4.33);
-    
-    if (totalMonths <= 6) {
-      // Show all months if 6 or fewer
-      while (current <= endDate) {
-        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-        current.setMonth(current.getMonth() + 1);
-      }
-    } else {
-      // Show 6 evenly spaced months
-      const monthInterval = Math.ceil(totalMonths / 6);
-      for (let i = 0; i < 6; i++) {
-        labels.push(current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-        current.setMonth(current.getMonth() + monthInterval);
-      }
-    }
-    
-    return labels;
-  };
-
-  const monthLabels = generateMonthLabels();
-  const totalTimelineWeeks = maxWeeks;
-
-  // Calculate bar data
-  const barData = hoursOptions.map(hoursPerWeek => {
-    const weeks = Math.ceil(totalHours / hoursPerWeek);
-    const widthPercent = (weeks / totalTimelineWeeks) * 100;
-    return {
-      hoursPerWeek,
-      weeks,
-      widthPercent,
-      months: Math.ceil(weeks / 4.33)
-    };
-  });
-
-  // Create timeline HTML with sealed container styles
-  const timelineHtml = `
-    <div style="width: 100%; height: 100%; overflow: hidden; position: relative; font-size: 12px; line-height: 1.2;">
-      <div style="margin-bottom: 8px;">
-        ${barData.map((bar, index) => `
-          <div style="margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; margin-bottom: 1px;">
-              <span style="font-weight: 600; color: #374151; width: 70px; font-size: 11px;">${bar.hoursPerWeek}h/week</span>
-              <span style="font-size: 10px; color: #6b7280; margin-left: 6px;">${bar.weeks} weeks (${bar.months} months)</span>
-            </div>
-            <div style="height: 20px; background-color: #f3f4f6; border-radius: 4px; position: relative; overflow: hidden;">
-              <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 4px; color: white; font-size: 10px; font-weight: 600;">
-                ${bar.weeks}w
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <div style="position: relative; margin-top: 8px;">
-        <div style="height: 4px; background-color: #e5e7eb; border-radius: 2px; margin-bottom: 4px;"></div>
-        <div style="display: flex; justify-content: space-between; font-size: 8px; color: #6b7280;">
-          ${monthLabels.map(label => `<span>${label}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   document.body.appendChild(tempDiv);
-
-  const timelineChartElement = tempDiv.querySelector('#timelineChart') as HTMLElement;
-  if (timelineChartElement) {
-    timelineChartElement.innerHTML = timelineHtml;
-  }
 
   await pdf.html(tempDiv, {
     callback: () => {
@@ -342,10 +354,10 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     width: 190,
     windowWidth: 800,
     html2canvas: {
-      scale: 0.65,
+      scale: 0.75,
       useCORS: true,
       letterRendering: true,
-      height: 1100,
+      height: 1000,
       width: 800
     }
   });
