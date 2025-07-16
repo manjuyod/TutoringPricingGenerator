@@ -259,7 +259,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
     if (timeline) {
       const canvas = tempDiv.querySelector('#timelineChart') as HTMLCanvasElement;
       if (canvas) {
-        drawLineChart(canvas, timeline);
+        drawHorizontalBarChart(canvas, timeline);
       }
     }
 
@@ -388,4 +388,116 @@ function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
     ctx.textAlign = 'left';
     ctx.fillText(`${hoursPerWeek} hrs/week`, legendX + 20, legendY);
   });
+}
+
+function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): void {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Chart dimensions
+  const padding = 60;
+  const leftPadding = 120; // Space for labels
+  const rightPadding = 40;
+  const chartWidth = canvas.width - leftPadding - rightPadding;
+  const chartHeight = canvas.height - 2 * padding;
+
+  // Calculate bar dimensions
+  const barHeight = chartHeight / timeline.length * 0.7;
+  const barSpacing = chartHeight / timeline.length * 0.3;
+  const maxHours = Math.max(...timeline.map(t => t.hoursPerWeek));
+
+  // Draw title
+  ctx.fillStyle = '#374151';
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Hours per Week by Timeline Option', canvas.width / 2, 30);
+
+  // Colors for different bars
+  const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
+
+  // Draw horizontal bars
+  timeline.forEach(({ hoursPerWeek, months }, index) => {
+    const barY = padding + (index * (barHeight + barSpacing)) + barSpacing / 2;
+    const barWidth = (hoursPerWeek / maxHours) * chartWidth;
+
+    // Draw bar
+    ctx.fillStyle = colors[index] || '#0063a8';
+    ctx.fillRect(leftPadding, barY, barWidth, barHeight);
+
+    // Add border to bar
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(leftPadding, barY, barWidth, barHeight);
+
+    // Add value label on the bar
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'left';
+    const textX = leftPadding + Math.max(barWidth / 2 - 20, 10);
+    ctx.fillText(`${hoursPerWeek}h`, textX, barY + barHeight / 2 + 5);
+
+    // Add timeline description on the left
+    ctx.fillStyle = '#374151';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${months} months`, leftPadding - 10, barY + barHeight / 2 + 4);
+
+    // Add extended label on the right
+    ctx.fillStyle = '#374151';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`(${months} month timeline)`, leftPadding + barWidth + 10, barY + barHeight / 2 + 4);
+  });
+
+  // Draw axes
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  
+  // Y-axis (left side)
+  ctx.beginPath();
+  ctx.moveTo(leftPadding, padding);
+  ctx.lineTo(leftPadding, padding + chartHeight);
+  ctx.stroke();
+
+  // X-axis (bottom)
+  ctx.beginPath();
+  ctx.moveTo(leftPadding, padding + chartHeight);
+  ctx.lineTo(leftPadding + chartWidth, padding + chartHeight);
+  ctx.stroke();
+
+  // Add X-axis labels (hours scale)
+  ctx.fillStyle = '#6b7280';
+  ctx.font = '10px Arial';
+  ctx.textAlign = 'center';
+  
+  const stepSize = Math.ceil(maxHours / 5);
+  for (let i = 0; i <= maxHours; i += stepSize) {
+    const x = leftPadding + (i / maxHours) * chartWidth;
+    ctx.fillText(i.toString(), x, padding + chartHeight + 15);
+    
+    // Draw grid lines
+    if (i > 0) {
+      ctx.strokeStyle = '#f3f4f6';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x, padding);
+      ctx.lineTo(x, padding + chartHeight);
+      ctx.stroke();
+    }
+  }
+
+  // Add axis labels
+  ctx.fillStyle = '#374151';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Hours per Week', leftPadding + chartWidth / 2, canvas.height - 15);
+
+  ctx.save();
+  ctx.translate(25, padding + chartHeight / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Timeline Duration', 0, 0);
+  ctx.restore();
 }
