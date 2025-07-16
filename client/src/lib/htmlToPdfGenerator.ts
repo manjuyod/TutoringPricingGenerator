@@ -321,6 +321,14 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
 
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
+  
+  // Constrain the temporary container's styling
+  tempDiv.style.maxWidth = '794px'; // A4 width in pixels at 96 DPI
+  tempDiv.style.margin = '0 auto';
+  tempDiv.style.padding = '0';
+  tempDiv.style.boxSizing = 'border-box';
+  tempDiv.style.zoom = '0.8'; // Visually scale down content
+  
   document.body.appendChild(tempDiv);
 
   const timelineChartElement = tempDiv.querySelector('#timelineChart') as HTMLElement;
@@ -338,7 +346,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     width: 190,
     windowWidth: 800,
     html2canvas: {
-      scale: 0.8,
+      scale: 1,
       useCORS: true,
       letterRendering: true,
     }
