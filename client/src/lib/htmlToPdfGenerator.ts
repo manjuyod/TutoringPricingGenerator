@@ -296,7 +296,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
 
   // Create timeline chart as separate element for rasterization
   const chartDiv = document.createElement('div');
-  chartDiv.style.width = '400px'; // Fixed width for chart (2/3 of ~600px content area)
+  chartDiv.style.width = '320px'; // Reduced width for chart
   chartDiv.style.padding = '20px';
   chartDiv.style.backgroundColor = 'white';
   chartDiv.style.fontFamily = "'Segoe UI', Arial, sans-serif";
@@ -334,7 +334,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     scale: 2,
     useCORS: true,
     backgroundColor: 'white',
-    width: 400,
+    width: 320,
     height: 160
   });
 
@@ -352,7 +352,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
   // Replace timeline chart placeholder with image
   const timelineChartElement = tempDiv.querySelector('#timelineChart') as HTMLElement;
   if (timelineChartElement) {
-    timelineChartElement.innerHTML = `<img src="${chartImageData}" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto;" crossOrigin="anonymous">`;
+    timelineChartElement.innerHTML = `<img src="${chartImageData}" style="width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto;" crossOrigin="anonymous">`;
   }
 
   await pdf.html(tempDiv, {
