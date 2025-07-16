@@ -40,7 +40,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string) {
   // Create HTML content for page 1
   const htmlContent = `
-    <div style="width: 720px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
+    <div style="width: 800px; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 15px 0; border-bottom: 2px solid #0063a8;">
         <div>
@@ -332,13 +332,13 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     callback: () => {
       document.body.removeChild(tempDiv);
     },
-    margin: [15, 15, 15, 15],
+    margin: [10, 10, 10, 10],
     x: 0,
     y: 0,
-    width: 180,
-    windowWidth: 720,
+    width: 190,
+    windowWidth: 800,
     html2canvas: {
-      scale: 0.7,
+      scale: 0.45,
       useCORS: true,
       letterRendering: true,
     }
