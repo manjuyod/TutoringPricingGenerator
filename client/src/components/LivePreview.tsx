@@ -45,9 +45,20 @@ export default function LivePreview({ subjects, weeklyHoursRange }: LivePreviewP
         </div>
         
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-medium text-gray-900 mb-2">Timeline Chart</h4>
+          <h4 className="font-medium text-gray-900 mb-2">Estimated Timeline</h4>
           <div className="text-sm text-gray-600">
-            {totalHours > 0 ? "See timeline visualization below in PDF" : "Configure hours to see timeline"}
+            {timeline.length > 0 ? (
+              <ul className="space-y-1">
+                {timeline.map(({ hoursPerWeek, months }) => (
+                  <li key={hoursPerWeek} className="flex justify-between">
+                    <span>{hoursPerWeek}h/week:</span>
+                    <span className="font-medium">{months} months</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              "Configure hours to see timeline"
+            )}
           </div>
         </div>
       </CardContent>
