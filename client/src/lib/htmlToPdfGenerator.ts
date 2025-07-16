@@ -40,21 +40,21 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string) {
   // Create HTML content for page 1
   const htmlContent = `
-    <div style="width: 794px; padding: 30px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
+    <div style="width: 794px; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-bottom: 3px solid #0063a8;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding: 15px 0; border-bottom: 3px solid #0063a8;">
         <div>
-          <h1 style="font-size: 36px; font-weight: bold; color: #0063a8; margin: 0 0 8px 0;">Academic Game Plan</h1>
-          <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
+          <h1 style="font-size: 32px; font-weight: bold; color: #0063a8; margin: 0 0 6px 0;">Academic Game Plan</h1>
+          <h2 style="font-size: 18px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="${LOGO_B64}" alt="Tutoring Club Logo" style="height: 60px; width: auto;" crossOrigin="anonymous">
+          <img src="${LOGO_B64}" alt="Tutoring Club Logo" style="height: 55px; width: auto;" crossOrigin="anonymous">
         </div>
       </div>
 
       <!-- Description -->
-      <div style="margin-bottom: 25px; background: #f8fafc; border-left: 4px solid #0063a8; padding: 15px; border-radius: 8px;">
-        <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0; font-style: italic;">
+      <div style="margin-bottom: 20px; background: #f8fafc; border-left: 4px solid #0063a8; padding: 12px; border-radius: 8px;">
+        <p style="font-size: 14px; line-height: 1.5; color: #1f2937; margin: 0; font-style: italic;">
           At Tutoring Club, we believe every student has the potential to thrive—with the right support. 
           Based on your academic goals and our in-depth assessment, we've put together a customized roadmap 
           designed to close learning gaps, build confidence, and get results.
@@ -338,9 +338,11 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     width: 190,
     windowWidth: 800,
     html2canvas: {
-      scale: 0.8,
+      scale: 0.65,
       useCORS: true,
       letterRendering: true,
+      height: 1100,
+      width: 800
     }
   });
 }
