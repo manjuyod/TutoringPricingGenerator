@@ -416,8 +416,8 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.textAlign = 'center';
   ctx.fillText('Timeline Duration by Hours per Week', canvas.width / 2, 30);
 
-  // Colors for different bars
-  const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
+  // Colors for different bars (reversed so bottom is darkest, top is lightest)
+  const colors = ['#ffcaa0', '#ffab7d', '#ff8c5a', '#f26a31'];
 
   // Draw axes
   ctx.strokeStyle = '#374151';
