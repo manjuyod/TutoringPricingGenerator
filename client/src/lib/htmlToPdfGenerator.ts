@@ -399,23 +399,24 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
 
   // Chart dimensions
   const padding = 60;
-  const leftPadding = 80; // Space for Y-axis labels
+  const leftPadding = 120; // Space for Y-axis labels
   const rightPadding = 40;
-  const bottomPadding = 80; // Space for X-axis labels
+  const bottomPadding = 60; // Space for X-axis labels
   const chartWidth = canvas.width - leftPadding - rightPadding;
   const chartHeight = canvas.height - padding - bottomPadding;
 
-  // Calculate scales
+  // Calculate bar dimensions
+  const barHeight = chartHeight / timeline.length * 0.7;
+  const barSpacing = chartHeight / timeline.length * 0.3;
   const maxMonths = Math.max(...timeline.map(t => t.months));
-  const maxHours = Math.max(...timeline.map(t => t.hoursPerWeek));
 
   // Draw title
   ctx.fillStyle = '#374151';
   ctx.font = 'bold 16px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Timeline vs Hours per Week', canvas.width / 2, 30);
+  ctx.fillText('Timeline Duration by Hours per Week', canvas.width / 2, 30);
 
-  // Colors for different data points
+  // Colors for different bars
   const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
 
   // Draw axes
@@ -457,70 +458,39 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
     ctx.fillText(i.toString(), x, padding + chartHeight + 20);
   }
 
-  // Draw grid lines and Y-axis labels (hours per week)
-  ctx.textAlign = 'right';
-  const hourStepSize = Math.ceil(maxHours / 6);
-  for (let i = 0; i <= maxHours; i += hourStepSize) {
-    const y = padding + chartHeight - (i / maxHours) * chartHeight;
-    
-    // Draw grid line
-    if (i > 0) {
-      ctx.strokeStyle = '#f3f4f6';
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(leftPadding, y);
-      ctx.lineTo(leftPadding + chartWidth, y);
-      ctx.stroke();
-    }
-    
-    // Draw label
-    ctx.fillStyle = '#6b7280';
-    ctx.fillText(i.toString(), leftPadding - 10, y + 4);
-  }
-
-  // Plot data points as circles
+  // Draw horizontal bars
   timeline.forEach(({ hoursPerWeek, months }, index) => {
-    const x = leftPadding + (months / maxMonths) * chartWidth;
-    const y = padding + chartHeight - (hoursPerWeek / maxHours) * chartHeight;
-    
-    // Draw circle
+    const barY = padding + (index * (barHeight + barSpacing)) + barSpacing / 2;
+    const barWidth = (months / maxMonths) * chartWidth;
+
+    // Draw bar
     ctx.fillStyle = colors[index] || '#0063a8';
-    ctx.beginPath();
-    ctx.arc(x, y, 12, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.fillRect(leftPadding, barY, barWidth, barHeight);
 
-    // Add border to circle
+    // Add border to bar
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // Add value labels near the point
-    ctx.fillStyle = '#374151';
-    ctx.font = 'bold 11px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${hoursPerWeek}h/wk`, x, y - 20);
-    ctx.fillText(`${months}mo`, x, y + 30);
-  });
-
-  // Connect points with a line
-  if (timeline.length > 1) {
-    ctx.strokeStyle = '#0063a8';
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    
-    timeline.forEach(({ hoursPerWeek, months }, index) => {
-      const x = leftPadding + (months / maxMonths) * chartWidth;
-      const y = padding + chartHeight - (hoursPerWeek / maxHours) * chartHeight;
-      
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    });
-    
-    ctx.stroke();
-  }
+    ctx.strokeRect(leftPadding, barY, barWidth, barHeight);
+
+    // Add value label inside the bar
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'center';
+    const textX = leftPadding + Math.max(barWidth / 2, 25);
+    ctx.fillText(`${months} months`, textX, barY + barHeight / 2 + 5);
+
+    // Add hours per week label on the left
+    ctx.fillStyle = '#374151';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${hoursPerWeek}h/week`, leftPadding - 10, barY + barHeight / 2 + 5);
+
+    // Add extended label on the right
+    ctx.fillStyle = '#374151';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`(${hoursPerWeek} hours weekly)`, leftPadding + barWidth + 10, barY + barHeight / 2 + 4);
+  });
 
   // Add axis labels
   ctx.fillStyle = '#374151';
