@@ -90,7 +90,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       <div>
         <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Timeline Options</h3>
         <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
-          <canvas id="timelineChart" width="500" height="180" style="width: 100%; max-width: 500px; height: 180px; display: block; margin: 0 auto;"></canvas>
+          <div id="timelineChart" style="width: 100%; max-width: 500px; height: 140px; display: block; margin: 0 auto;"></div>
           <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
             <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
@@ -296,24 +296,24 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
 
   // Create timeline HTML
   const timelineHtml = `
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 12px;">
       ${barData.map((bar, index) => `
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; color: #374151; width: 80px; font-size: 14px;">${bar.hoursPerWeek}h/week</span>
-            <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">${bar.weeks} weeks (${bar.months} months)</span>
+        <div style="margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; margin-bottom: 2px;">
+            <span style="font-weight: 600; color: #374151; width: 80px; font-size: 13px;">${bar.hoursPerWeek}h/week</span>
+            <span style="font-size: 11px; color: #6b7280; margin-left: 8px;">${bar.weeks} weeks (${bar.months} months)</span>
           </div>
-          <div style="height: 32px; background-color: #f3f4f6; border-radius: 8px; position: relative; overflow: hidden;">
-            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 12px; font-weight: 600;">
+          <div style="height: 24px; background-color: #f3f4f6; border-radius: 6px; position: relative; overflow: hidden;">
+            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; color: white; font-size: 11px; font-weight: 600;">
               ${bar.weeks}w
             </div>
           </div>
         </div>
       `).join('')}
     </div>
-    <div style="position: relative; margin-top: 20px;">
-      <div style="height: 8px; background-color: #e5e7eb; border-radius: 4px; margin-bottom: 8px;"></div>
-      <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6b7280;">
+    <div style="position: relative; margin-top: 12px;">
+      <div style="height: 6px; background-color: #e5e7eb; border-radius: 3px; margin-bottom: 6px;"></div>
+      <div style="display: flex; justify-content: space-between; font-size: 9px; color: #6b7280;">
         ${monthLabels.map(label => `<span>${label}</span>`).join('')}
       </div>
     </div>
