@@ -40,21 +40,21 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[], weeklyHoursRange: string) {
   // Create HTML content for page 1
   const htmlContent = `
-    <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
+    <div style="width: 794px; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-bottom: 3px solid #0063a8;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 15px 0; border-bottom: 2px solid #0063a8;">
         <div>
-          <h1 style="font-size: 36px; font-weight: bold; color: #0063a8; margin: 0 0 8px 0;">Academic Game Plan</h1>
-          <h2 style="font-size: 20px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
+          <h1 style="font-size: 28px; font-weight: bold; color: #0063a8; margin: 0 0 5px 0;">Academic Game Plan</h1>
+          <h2 style="font-size: 16px; color: #f26a31; margin: 0; font-weight: 600;">Personalized Learning Strategy</h2>
         </div>
         <div>
-          <img src="${LOGO_B64}" alt="Tutoring Club Logo" style="height: 60px; width: auto;" crossOrigin="anonymous">
+          <img src="${LOGO_B64}" alt="Tutoring Club Logo" style="height: 50px; width: auto;" crossOrigin="anonymous">
         </div>
       </div>
 
       <!-- Description -->
-      <div style="margin-bottom: 30px; background: #f8fafc; border-left: 4px solid #0063a8; padding: 20px; border-radius: 8px;">
-        <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0; font-style: italic;">
+      <div style="margin-bottom: 20px; background: #f8fafc; border-left: 3px solid #0063a8; padding: 15px; border-radius: 6px;">
+        <p style="font-size: 14px; line-height: 1.5; color: #1f2937; margin: 0; font-style: italic;">
           At Tutoring Club, we believe every student has the potential to thrive—with the right support. 
           Based on your academic goals and our in-depth assessment, we've put together a customized roadmap 
           designed to close learning gaps, build confidence, and get results.
@@ -62,25 +62,25 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       </div>
 
       <!-- Recommended Sessions with Total Hours -->
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 21px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Sessions by Subject</h3>
-        <div style="display: flex; gap: 24px;">
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-size: 16px; font-weight: bold; color: #0063a8; margin: 0 0 15px 0; border-bottom: 2px solid #0063a8; padding-bottom: 5px;">Recommended Sessions by Subject</h3>
+        <div style="display: flex; gap: 20px;">
           <!-- Subjects List -->
-          <div style="flex: 1; padding: 20px;">
+          <div style="flex: 1; padding: 15px;">
             ${selectedSubjects.map(({ name, hours }, index) => `
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-bottom: ${index === selectedSubjects.length - 1 ? '0' : '8px'}; border-bottom: 1px solid #e2e8f0;">
-                <span style="color: #1f2937; font-size: 16px; font-weight: 500;">${name}</span>
-                <span style="color: #0063a8; font-weight: bold; font-size: 20px;">${hours} hours</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; margin-bottom: ${index === selectedSubjects.length - 1 ? '0' : '5px'}; border-bottom: 1px solid #e2e8f0;">
+                <span style="color: #1f2937; font-size: 14px; font-weight: 500;">${name}</span>
+                <span style="color: #0063a8; font-weight: bold; font-size: 16px;">${hours} hours</span>
               </div>
             `).join('')}
           </div>
 
           <!-- Total Hours -->
-          <div style="flex: 0 0 240px; border: 3px solid #0063a8; border-radius: 12px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+          <div style="flex: 0 0 180px; border: 2px solid #0063a8; border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
             <div>
-              <div style="font-size: 14px; margin-bottom: 6px; font-weight: 600; color: #0063a8;">Total Recommended Hours</div>
-              <div style="font-size: 36px; font-weight: bold; margin-bottom: 4px; color: #f26a31;">${totalHours}</div>
-              <div style="font-size: 16px; font-weight: 600; color: #f26a31;">hours</div>
+              <div style="font-size: 12px; margin-bottom: 4px; font-weight: 600; color: #0063a8;">Total Recommended Hours</div>
+              <div style="font-size: 28px; font-weight: bold; margin-bottom: 2px; color: #f26a31;">${totalHours}</div>
+              <div style="font-size: 14px; font-weight: 600; color: #f26a31;">hours</div>
             </div>
           </div>
         </div>
@@ -88,11 +88,11 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
 
       <!-- Timeline Line Chart -->
       <div>
-        <h3 style="font-size: 20px; font-weight: bold; color: #0063a8; margin: 0 0 17px 0; border-bottom: 3px solid #0063a8; padding-bottom: 8px;">Recommended Timeline Options</h3>
-        <div style="background: white; border-radius: 12px; padding: 16px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
-          <div id="timelineChart" width="700" height="280" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;"></div>
-          <div style="text-align: center; padding-top: 8px; border-top: 1px solid #e5e7eb; margin-top: 8px; width: 100%;">
-            <span style="font-size: 10px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
+        <h3 style="font-size: 16px; font-weight: bold; color: #0063a8; margin: 0 0 12px 0; border-bottom: 2px solid #0063a8; padding-bottom: 5px;">Recommended Timeline Options</h3>
+        <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;">
+          <div id="timelineChart" width="650" height="200" style="width: 100%; max-width: 650px; height: 200px; display: block; margin: 0 auto;"></div>
+          <div style="text-align: center; padding-top: 6px; border-top: 1px solid #e5e7eb; margin-top: 6px; width: 100%;">
+            <span style="font-size: 9px; color: #6b7280; font-style: italic;">Choose the timeline that best fits your schedule and goals</span>
           </div>
         </div>
       </div>
@@ -283,24 +283,24 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
 
   // Create timeline HTML
   const timelineHtml = `
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 15px;">
       ${barData.map((bar, index) => `
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; color: #374151; width: 80px; font-size: 14px;">${bar.hoursPerWeek}h/week</span>
-            <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">${bar.weeks} weeks (${bar.months} months)</span>
+        <div style="margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; margin-bottom: 3px;">
+            <span style="font-weight: 600; color: #374151; width: 70px; font-size: 12px;">${bar.hoursPerWeek}h/week</span>
+            <span style="font-size: 10px; color: #6b7280; margin-left: 6px;">${bar.weeks} weeks (${bar.months} months)</span>
           </div>
-          <div style="height: 32px; background-color: #f3f4f6; border-radius: 8px; position: relative; overflow: hidden;">
-            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 12px; font-weight: 600;">
+          <div style="height: 24px; background-color: #f3f4f6; border-radius: 6px; position: relative; overflow: hidden;">
+            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; color: white; font-size: 10px; font-weight: 600;">
               ${bar.weeks}w
             </div>
           </div>
         </div>
       `).join('')}
     </div>
-    <div style="position: relative; margin-top: 20px;">
-      <div style="height: 8px; background-color: #e5e7eb; border-radius: 4px; margin-bottom: 8px;"></div>
-      <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6b7280;">
+    <div style="position: relative; margin-top: 15px;">
+      <div style="height: 6px; background-color: #e5e7eb; border-radius: 3px; margin-bottom: 6px;"></div>
+      <div style="display: flex; justify-content: space-between; font-size: 8px; color: #6b7280;">
         ${monthLabels.map(label => `<span>${label}</span>`).join('')}
       </div>
     </div>
@@ -319,15 +319,17 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     callback: () => {
       document.body.removeChild(tempDiv);
     },
-    margin: [10, 10, 10, 10],
+    margin: [5, 5, 5, 5],
     x: 0,
     y: 0,
-    width: 190,
-    windowWidth: 800,
+    width: 200,
+    windowWidth: 794,
     html2canvas: {
-      scale: 0.8,
+      scale: 0.6,
       useCORS: true,
       letterRendering: true,
+      height: 1123,
+      width: 794
     }
   });
 }
