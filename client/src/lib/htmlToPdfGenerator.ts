@@ -242,6 +242,47 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 }
 
 async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[], totalHours: number, weeklyHoursRange: string) {
+  // First, create the chart as a separate image
+  const chartImageDataUrl = await createTimelineChartImage(totalHours, weeklyHoursRange);
+  
+  // Create the main content without the chart
+  const contentWithoutChart = htmlContent.replace(
+    '<div id="timelineChart" width="700" height="280" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;"></div>',
+    `<img src="${chartImageDataUrl}" style="width: 100%; max-width: 700px; height: 280px; display: block; margin: 0 auto;" />`
+  );
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = contentWithoutChart;
+  tempDiv.style.position = 'absolute';
+  tempDiv.style.left = '-100000px';
+  tempDiv.style.top = '0';
+  tempDiv.style.width = '800px';
+  tempDiv.style.backgroundColor = 'white';
+  document.body.appendChild(tempDiv);
+
+  try {
+    await pdf.html(tempDiv, {
+      callback: () => {
+        document.body.removeChild(tempDiv);
+      },
+      margin: [10, 10, 10, 10],
+      x: 0,
+      y: 0,
+      width: 190,
+      windowWidth: 800,
+      html2canvas: {
+        scale: 0.8,
+        useCORS: true,
+        letterRendering: true,
+      }
+    });
+  } catch (error) {
+    document.body.removeChild(tempDiv);
+    throw error;
+  }
+}
+
+async function createTimelineChartImage(totalHours: number, weeklyHoursRange: string): Promise<string> {
   const hoursOptions = weeklyHoursRange === "2-8" ? [2, 4, 6, 8] : [4, 8, 12, 16];
   const currentDate = new Date();
 
@@ -300,53 +341,57 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline: any[],
     };
   });
 
-  // Create timeline HTML
+  // Create timeline HTML for isolated rendering
   const timelineHtml = `
-    <div style="margin-bottom: 20px;">
-      ${barData.map((bar, index) => `
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; color: #374151; width: 80px; font-size: 14px;">${bar.hoursPerWeek}h/week</span>
-            <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">${bar.weeks} weeks (${bar.months} months)</span>
-          </div>
-          <div style="height: 32px; background-color: #f3f4f6; border-radius: 8px; position: relative; overflow: hidden;">
-            <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 12px; font-weight: 600;">
-              ${bar.weeks}w
+    <div style="width: 700px; height: 280px; background: white; padding: 20px; font-family: 'Segoe UI', Arial, sans-serif;">
+      <div style="margin-bottom: 20px;">
+        ${barData.map((bar, index) => `
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 600; color: #374151; width: 80px; font-size: 14px;">${bar.hoursPerWeek}h/week</span>
+              <span style="font-size: 12px; color: #6b7280; margin-left: 8px;">${bar.weeks} weeks (${bar.months} months)</span>
+            </div>
+            <div style="height: 32px; background-color: #f3f4f6; border-radius: 8px; position: relative; overflow: hidden;">
+              <div style="height: 100%; background-color: ${index === 0 ? '#2563eb' : index === 1 ? '#3b82f6' : index === 2 ? '#60a5fa' : '#93c5fd'}; width: ${bar.widthPercent}%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 12px; font-weight: 600;">
+                ${bar.weeks}w
+              </div>
             </div>
           </div>
+        `).join('')}
+      </div>
+      <div style="position: relative; margin-top: 20px;">
+        <div style="height: 8px; background-color: #e5e7eb; border-radius: 4px; margin-bottom: 8px;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6b7280;">
+          ${monthLabels.map(label => `<span>${label}</span>`).join('')}
         </div>
-      `).join('')}
-    </div>
-    <div style="position: relative; margin-top: 20px;">
-      <div style="height: 8px; background-color: #e5e7eb; border-radius: 4px; margin-bottom: 8px;"></div>
-      <div style="display: flex; justify-content: space-between; font-size: 10px; color: #6b7280;">
-        ${monthLabels.map(label => `<span>${label}</span>`).join('')}
       </div>
     </div>
   `;
 
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
-  document.body.appendChild(tempDiv);
+  // Create isolated chart element
+  const chartDiv = document.createElement('div');
+  chartDiv.innerHTML = timelineHtml;
+  chartDiv.style.position = 'absolute';
+  chartDiv.style.left = '-10000px';
+  chartDiv.style.top = '0';
+  chartDiv.style.width = '700px';
+  chartDiv.style.height = '280px';
+  document.body.appendChild(chartDiv);
 
-  const timelineChartElement = tempDiv.querySelector('#timelineChart') as HTMLElement;
-  if (timelineChartElement) {
-    timelineChartElement.innerHTML = timelineHtml;
-  }
-
-  await pdf.html(tempDiv, {
-    callback: () => {
-      document.body.removeChild(tempDiv);
-    },
-    margin: [10, 10, 10, 10],
-    x: 0,
-    y: 0,
-    width: 190,
-    windowWidth: 800,
-    html2canvas: {
-      scale: 0.8,
+  try {
+    const canvas = await html2canvas(chartDiv.firstElementChild as HTMLElement, {
+      width: 700,
+      height: 280,
+      scale: 2,
+      backgroundColor: 'white',
       useCORS: true,
-      letterRendering: true,
-    }
-  });
+    });
+    
+    const imageDataUrl = canvas.toDataURL('image/png');
+    document.body.removeChild(chartDiv);
+    return imageDataUrl;
+  } catch (error) {
+    document.body.removeChild(chartDiv);
+    throw error;
+  }
 }
