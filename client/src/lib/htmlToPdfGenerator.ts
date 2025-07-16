@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions } from './pricingCalculations';
+import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
@@ -102,7 +102,11 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
   await renderHtmlToPdf(pdf, htmlContent, timeline);
 }
 
-async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: any) {
+async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: { 
+  twelveMonth: FinancingOption[];
+  eighteenMonth: FinancingOption[];
+  twentyFourMonth: FinancingOption[];
+}) {
   // Add title with brand styling
     pdf.setFontSize(30);
     pdf.setFont('helvetica', 'bold');

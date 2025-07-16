@@ -80,7 +80,7 @@ export function calculatePrepayOptions(
   const discounts = customDiscounts || defaultPrepayDiscounts;
   
   return packages.map(hours => {
-    const discountPercent = discounts[hours.toString()] || 0;
+    const discountPercent = (discounts as Record<string, number>)[hours.toString()] || 0;
     const adjustedHourlyRate = hourlyRate * (1 - discountPercent / 100);
     const totalCost = hours * adjustedHourlyRate;
     const savings = (hours * hourlyRate) * (discountPercent / 100);
@@ -109,7 +109,7 @@ export function calculateFinancingOptions(
   
   const calculateForTerm = (months: number, discountAdjustment: number = 0) => {
     return packages.map(hours => {
-      const discountPercent = Math.max(0, (baseDiscounts[hours.toString()] || 0) + discountAdjustment);
+      const discountPercent = Math.max(0, ((baseDiscounts as Record<string, number>)[hours.toString()] || 0) + discountAdjustment);
       const adjustedHourlyRate = hourlyRate * (1 - discountPercent / 100);
       const totalCost = hours * adjustedHourlyRate;
       const monthlyCost = totalCost / months;

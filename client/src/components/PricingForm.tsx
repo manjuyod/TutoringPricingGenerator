@@ -53,8 +53,8 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   useEffect(() => {
     const isValid = form.formState.isValid && 
       watchedValues.hourlyRate > 0 && 
-      watchedValues.weeklyHours && 
-      watchedValues.packageRange;
+      !!watchedValues.weeklyHours && 
+      !!watchedValues.packageRange;
     
     onValidityChange(isValid);
 
@@ -98,7 +98,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   }, [watchedValues.packageRange, selectedPackageRange, form]);
 
   // Generate hour options (16-400 in increments of 16)
-  const hourOptions = [];
+  const hourOptions: number[] = [];
   for (let i = 16; i <= 400; i += 16) {
     hourOptions.push(i);
   }

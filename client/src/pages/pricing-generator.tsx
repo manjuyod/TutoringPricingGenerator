@@ -43,7 +43,7 @@ export default function PricingGenerator() {
                   </div>
                 </ErrorBoundary>
               )}
-            </div></old_str>
+            </div>
           </div>
         </div>
       </header>
@@ -79,8 +79,8 @@ export default function PricingGenerator() {
                 )}
               </div>
             </ErrorBoundary>
-          </div></old_str>
-        </div></header_str>
+          </div>
+        </div>
       </div>
     </div>
   );
