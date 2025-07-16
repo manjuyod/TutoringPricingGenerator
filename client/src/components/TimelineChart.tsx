@@ -21,19 +21,41 @@ export default function TimelineChart({ totalHours, weeklyHoursRange }: Timeline
   const endDate = new Date(currentDate);
   endDate.setDate(endDate.getDate() + (maxWeeks * 7));
   
-  // Generate month labels for timeline
+  // Generate month labels for timeline (max 6 months)
   const generateMonthLabels = () => {
     const labels = [];
     const current = new Date(currentDate);
     current.setDate(1); // Start at first of month
     
-    while (current <= endDate) {
-      labels.push({
-        date: new Date(current),
-        label: current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-      });
-      current.setMonth(current.getMonth() + 1);
+    const totalMonths = Math.ceil(maxWeeks / 4.33);
+    const maxLabels = 6;
+    
+    if (totalMonths <= maxLabels) {
+      // Show all months if 6 or fewer
+      while (current <= endDate) {
+        labels.push({
+          date: new Date(current),
+          label: current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+        });
+        current.setMonth(current.getMonth() + 1);
+      }
+    } else {
+      // Show every nth month to fit in 6 labels
+      const step = Math.ceil(totalMonths / maxLabels);
+      let monthCount = 0;
+      
+      while (current <= endDate && labels.length < maxLabels) {
+        if (monthCount % step === 0) {
+          labels.push({
+            date: new Date(current),
+            label: current.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+          });
+        }
+        current.setMonth(current.getMonth() + 1);
+        monthCount++;
+      }
     }
+    
     return labels;
   };
   
