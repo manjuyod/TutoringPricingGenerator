@@ -399,62 +399,28 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
 
   // Chart dimensions
   const padding = 60;
-  const leftPadding = 120; // Space for labels
+  const leftPadding = 80; // Space for Y-axis labels
   const rightPadding = 40;
+  const bottomPadding = 80; // Space for X-axis labels
   const chartWidth = canvas.width - leftPadding - rightPadding;
-  const chartHeight = canvas.height - 2 * padding;
+  const chartHeight = canvas.height - padding - bottomPadding;
 
-  // Calculate bar dimensions
-  const barHeight = chartHeight / timeline.length * 0.7;
-  const barSpacing = chartHeight / timeline.length * 0.3;
+  // Calculate scales
+  const maxMonths = Math.max(...timeline.map(t => t.months));
   const maxHours = Math.max(...timeline.map(t => t.hoursPerWeek));
 
   // Draw title
   ctx.fillStyle = '#374151';
   ctx.font = 'bold 16px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Hours per Week by Timeline Option', canvas.width / 2, 30);
+  ctx.fillText('Timeline vs Hours per Week', canvas.width / 2, 30);
 
-  // Colors for different bars
+  // Colors for different data points
   const colors = ['#f26a31', '#ff8c5a', '#ffab7d', '#ffcaa0'];
 
-  // Draw horizontal bars
-  timeline.forEach(({ hoursPerWeek, months }, index) => {
-    const barY = padding + (index * (barHeight + barSpacing)) + barSpacing / 2;
-    const barWidth = (hoursPerWeek / maxHours) * chartWidth;
-
-    // Draw bar
-    ctx.fillStyle = colors[index] || '#0063a8';
-    ctx.fillRect(leftPadding, barY, barWidth, barHeight);
-
-    // Add border to bar
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(leftPadding, barY, barWidth, barHeight);
-
-    // Add value label on the bar
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'left';
-    const textX = leftPadding + Math.max(barWidth / 2 - 20, 10);
-    ctx.fillText(`${hoursPerWeek}h`, textX, barY + barHeight / 2 + 5);
-
-    // Add timeline description on the left
-    ctx.fillStyle = '#374151';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText(`${months} months`, leftPadding - 10, barY + barHeight / 2 + 4);
-
-    // Add extended label on the right
-    ctx.fillStyle = '#374151';
-    ctx.font = '11px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(`(${months} month timeline)`, leftPadding + barWidth + 10, barY + barHeight / 2 + 4);
-  });
-
   // Draw axes
-  ctx.strokeStyle = '#e5e7eb';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#374151';
+  ctx.lineWidth = 2;
   
   // Y-axis (left side)
   ctx.beginPath();
@@ -468,36 +434,103 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.lineTo(leftPadding + chartWidth, padding + chartHeight);
   ctx.stroke();
 
-  // Add X-axis labels (hours scale)
+  // Draw grid lines and X-axis labels (months)
+  ctx.strokeStyle = '#f3f4f6';
+  ctx.lineWidth = 0.5;
   ctx.fillStyle = '#6b7280';
-  ctx.font = '10px Arial';
+  ctx.font = '12px Arial';
   ctx.textAlign = 'center';
   
-  const stepSize = Math.ceil(maxHours / 5);
-  for (let i = 0; i <= maxHours; i += stepSize) {
-    const x = leftPadding + (i / maxHours) * chartWidth;
-    ctx.fillText(i.toString(), x, padding + chartHeight + 15);
+  const monthStepSize = Math.ceil(maxMonths / 6);
+  for (let i = 0; i <= maxMonths; i += monthStepSize) {
+    const x = leftPadding + (i / maxMonths) * chartWidth;
     
-    // Draw grid lines
+    // Draw grid line
     if (i > 0) {
-      ctx.strokeStyle = '#f3f4f6';
-      ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(x, padding);
       ctx.lineTo(x, padding + chartHeight);
       ctx.stroke();
     }
+    
+    // Draw label
+    ctx.fillText(i.toString(), x, padding + chartHeight + 20);
+  }
+
+  // Draw grid lines and Y-axis labels (hours per week)
+  ctx.textAlign = 'right';
+  const hourStepSize = Math.ceil(maxHours / 6);
+  for (let i = 0; i <= maxHours; i += hourStepSize) {
+    const y = padding + chartHeight - (i / maxHours) * chartHeight;
+    
+    // Draw grid line
+    if (i > 0) {
+      ctx.strokeStyle = '#f3f4f6';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(leftPadding, y);
+      ctx.lineTo(leftPadding + chartWidth, y);
+      ctx.stroke();
+    }
+    
+    // Draw label
+    ctx.fillStyle = '#6b7280';
+    ctx.fillText(i.toString(), leftPadding - 10, y + 4);
+  }
+
+  // Plot data points as circles
+  timeline.forEach(({ hoursPerWeek, months }, index) => {
+    const x = leftPadding + (months / maxMonths) * chartWidth;
+    const y = padding + chartHeight - (hoursPerWeek / maxHours) * chartHeight;
+    
+    // Draw circle
+    ctx.fillStyle = colors[index] || '#0063a8';
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Add border to circle
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Add value labels near the point
+    ctx.fillStyle = '#374151';
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${hoursPerWeek}h/wk`, x, y - 20);
+    ctx.fillText(`${months}mo`, x, y + 30);
+  });
+
+  // Connect points with a line
+  if (timeline.length > 1) {
+    ctx.strokeStyle = '#0063a8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    timeline.forEach(({ hoursPerWeek, months }, index) => {
+      const x = leftPadding + (months / maxMonths) * chartWidth;
+      const y = padding + chartHeight - (hoursPerWeek / maxHours) * chartHeight;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    ctx.stroke();
   }
 
   // Add axis labels
   ctx.fillStyle = '#374151';
-  ctx.font = '12px Arial';
+  ctx.font = '14px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Hours per Week', leftPadding + chartWidth / 2, canvas.height - 15);
+  ctx.fillText('Timeline Duration (Months)', leftPadding + chartWidth / 2, canvas.height - 15);
 
   ctx.save();
   ctx.translate(25, padding + chartHeight / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillText('Timeline Duration', 0, 0);
+  ctx.fillText('Hours per Week', 0, 0);
   ctx.restore();
 }
