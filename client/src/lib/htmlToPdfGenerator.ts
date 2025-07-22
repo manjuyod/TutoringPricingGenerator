@@ -193,7 +193,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing/registration fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
+  pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
   yPosition += 6;
 
   // 12 Month Plan
@@ -414,7 +414,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.fillStyle = '#374151';
   ctx.font = 'bold 16px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Timeline Duration by Hours per Week', canvas.width / 2, 30);
+  ctx.fillText('Estimated Time to Achieve Academic Goals', canvas.width / 2, 30);
 
   // Colors for different bars (reversed so bottom is darkest, top is lightest)
   const colors = ['#ffcaa0', '#ffab7d', '#ff8c5a', '#f26a31'];
@@ -490,7 +490,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.fillStyle = '#374151';
   ctx.font = '14px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Timeline Duration (Months)', leftPadding + chartWidth / 2, canvas.height - 15);
+  ctx.fillText('Months', leftPadding + chartWidth / 2, canvas.height - 15);
 
   ctx.save();
   ctx.translate(25, padding + chartHeight / 2);
