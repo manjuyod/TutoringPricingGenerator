@@ -115,11 +115,28 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
 }) {
-  // Add title with brand styling
-    pdf.setFontSize(30);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(0, 99, 168); // Navy color
-    pdf.text('Tuition Payment Options', 20, 20);
+  // Add title with brand styling and Total Recommended Hours box inline
+  pdf.setFontSize(30);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 99, 168); // Navy color
+  pdf.text('Tuition Payment Options', 20, 20);
+
+  // Total Recommended Hours box - positioned inline with title
+  pdf.setFillColor(230, 244, 255); // Light blue background
+  pdf.rect(145, 8, 50, 20, 'F');
+  pdf.setLineWidth(0.5); // Thinner border like first page
+  pdf.setDrawColor(0, 99, 168);
+  pdf.rect(145, 8, 50, 20);
+  
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 99, 168);
+  pdf.text('Total Recommended Hours', 170, 15, { align: 'center' });
+  
+  // Calculate total hours from prepay options (first option has the total)
+  const totalHours = prepayOptions.length > 0 ? prepayOptions[0].hours : 0;
+  pdf.setFontSize(16);
+  pdf.setTextColor(242, 106, 49);
+  pdf.text(totalHours.toString(), 170, 23, { align: 'center' });
 
   // Add subtitle
   pdf.setFontSize(10);
@@ -127,25 +144,6 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.text('Flexible payment solutions designed for your budget', 20, 28);
 
   let yPosition = 40;
-
-  // Total Recommended Hours box
-  pdf.setFillColor(230, 244, 255); // Light blue background
-  pdf.rect(145, yPosition - 5, 50, 20, 'F');
-  pdf.setLineWidth(2);
-  pdf.setDrawColor(0, 99, 168);
-  pdf.rect(145, yPosition - 5, 50, 20);
-  
-  pdf.setFontSize(8);
-  pdf.setTextColor(0, 99, 168);
-  pdf.text('Total Recommended Hours', 170, yPosition);
-  
-  // Calculate total hours from prepay options (first option has the total)
-  const totalHours = prepayOptions.length > 0 ? prepayOptions[0].hours : 0;
-  pdf.setFontSize(16);
-  pdf.setTextColor(242, 106, 49);
-  pdf.text(totalHours.toString(), 170, yPosition + 10, { align: 'center' });
-
-  yPosition += 25;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
@@ -273,11 +271,26 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 }
 
 async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], totalHours: number, hourlyRate: number) {
-  // Add title with brand styling
+  // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 99, 168); // Navy color
   pdf.text('Tuition Payment Options', 20, 20);
+
+  // Total Recommended Hours box - positioned inline with title
+  pdf.setFillColor(230, 244, 255); // Light blue background
+  pdf.rect(145, 8, 50, 20, 'F');
+  pdf.setLineWidth(0.5); // Thinner border like first page
+  pdf.setDrawColor(0, 99, 168);
+  pdf.rect(145, 8, 50, 20);
+  
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 99, 168);
+  pdf.text('Total Recommended Hours', 170, 15, { align: 'center' });
+  
+  pdf.setFontSize(16);
+  pdf.setTextColor(242, 106, 49);
+  pdf.text(totalHours.toString(), 170, 23, { align: 'center' });
 
   // Add subtitle
   pdf.setFontSize(10);
@@ -285,23 +298,6 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   pdf.text('Simplified payment solutions for your convenience', 20, 28);
 
   let yPosition = 40;
-
-  // Total Recommended Hours box
-  pdf.setFillColor(230, 244, 255); // Light blue background
-  pdf.rect(145, yPosition - 5, 50, 20, 'F');
-  pdf.setLineWidth(2);
-  pdf.setDrawColor(0, 99, 168);
-  pdf.rect(145, yPosition - 5, 50, 20);
-  
-  pdf.setFontSize(8);
-  pdf.setTextColor(0, 99, 168);
-  pdf.text('Total Recommended Hours', 170, yPosition);
-  
-  pdf.setFontSize(16);
-  pdf.setTextColor(242, 106, 49);
-  pdf.text(totalHours.toString(), 170, yPosition + 10, { align: 'center' });
-
-  yPosition += 25;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
