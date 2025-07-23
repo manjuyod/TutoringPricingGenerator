@@ -395,10 +395,10 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   yPosition += 4;
 
   // Calculate prepay totals with 20% discount
-  const standardTotal = totalHours * hourlyRate;
-  const prepayDiscountedTotal = standardTotal * 0.8; // 20% discount
+  const prepayStandardTotal = totalHours * hourlyRate;
+  const prepayDiscountedTotal = prepayStandardTotal * 0.8; // 20% discount
   const prepayAdjustedHourlyRate = prepayDiscountedTotal / totalHours;
-  const prepaySavings = standardTotal - prepayDiscountedTotal;
+  const prepaySavings = prepayStandardTotal - prepayDiscountedTotal;
 
   autoTable(pdf, {
     startY: yPosition,
