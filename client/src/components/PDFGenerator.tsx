@@ -6,6 +6,7 @@ import { useState } from "react";
 
 interface PDFGeneratorProps {
   formData: {
+    version: string;
     hourlyRate: number;
     weeklyHours: string;
     subjects: SubjectHours;

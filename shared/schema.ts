@@ -18,6 +18,9 @@ export type User = typeof users.$inferSelect;
 
 // Pricing form schema
 export const pricingFormSchema = z.object({
+  version: z.enum(["tiered", "payment-plan"], {
+    required_error: "Please select a pricing sheet version",
+  }),
   hourlyRate: z.number().min(0.01, "Hourly rate must be greater than 0"),
   weeklyHours: z.enum(["2-8", "4-16"], {
     required_error: "Please select a weekly hours range",
@@ -30,7 +33,7 @@ export const pricingFormSchema = z.object({
   testPrep: z.number().min(0).max(400),
   packageRange: z.enum(["64,96,128,192", "96,128,160,192", "96,128,192,256", "128,256,320,400"], {
     required_error: "Please select a package range",
-  }),
+  }).optional(),
   prepayDiscounts: z.record(z.string(), z.number().min(0).max(100)),
   interestDiscounts: z.record(z.string(), z.number().min(0).max(100)),
 });

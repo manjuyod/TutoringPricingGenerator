@@ -5,6 +5,7 @@ import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeli
 import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
+  version: string;
   hourlyRate: number;
   weeklyHours: string;
   subjects: SubjectHours;
@@ -14,27 +15,34 @@ interface PdfFormData {
 }
 
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
-  const { hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
+  const { version, hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
 
   // Calculate all the data we need
   const totalHours = calculateTotalHours(subjects);
   const selectedSubjects = getSelectedSubjects(subjects);
   const timeline = calculateTimeline(totalHours, weeklyHours);
   const monthlyOptions = calculateMonthlyPaymentOptions(hourlyRate, weeklyHours);
-  const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
-  const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
 
   const pdf = new jsPDF('p', 'mm', 'a4');
 
-  // Page 1: Academic Game Plan
+  // Page 1: Academic Game Plan (same for both versions)
   await generatePage1(pdf, selectedSubjects, totalHours, timeline);
 
-  // Page 2: Payment Options
+  // Page 2: Payment Options (different based on version)
   pdf.addPage();
-  await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions);
+  if (version === "payment-plan") {
+    await generatePaymentPlanPage2(pdf, monthlyOptions, totalHours, hourlyRate);
+  } else {
+    const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
+    const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
+    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions);
+  }
 
   // Save the PDF
-  pdf.save('tutoring-club-academic-gameplan.pdf');
+  const filename = version === "payment-plan" ? 
+    'tutoring-club-payment-plan-pricing.pdf' : 
+    'tutoring-club-tiered-pricing.pdf';
+  pdf.save(filename);
 }
 
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[]) {
@@ -241,6 +249,161 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header with black text for readability
+    margin: { left: 20, right: 20 }
+  });
+}
+
+async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], totalHours: number, hourlyRate: number) {
+  // Add title with brand styling
+  pdf.setFontSize(30);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0, 99, 168); // Navy color
+  pdf.text('Tuition Payment Options', 20, 20);
+
+  // Add subtitle
+  pdf.setFontSize(10);
+  pdf.setTextColor(242, 106, 49); // Orange color
+  pdf.text('Simplified payment solutions for your convenience', 20, 28);
+
+  let yPosition = 40;
+
+  // Section 1: Monthly Tuition Option (Blue theme)
+  pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+
+  pdf.setFontSize(13);
+  pdf.setTextColor(0, 99, 168); // Brand blue
+  pdf.text('Monthly Tuition Option', 20, yPosition + 3);
+  yPosition += 8;
+
+  pdf.setFontSize(7);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('Pay as you go monthly. Testing fee: $75. Materials fee: $100.', 20, yPosition);
+  yPosition += 4;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours/Week', 'Monthly Cost', 'Hourly Rate']],
+    body: monthlyOptions.map(({ hoursPerWeek, monthlyCost, hourlyRate }) => [
+      hoursPerWeek.toString(),
+      `$${Math.round(monthlyCost)}`,
+      `$${hourlyRate.toFixed(2)}`
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: 'center' },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+
+  // Section 2: Payment Plan Option (Green theme)
+  pdf.setFillColor(240, 253, 244); // Light green background
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+
+  pdf.setFontSize(13);
+  pdf.setTextColor(34, 197, 94); // Green color
+  pdf.text('Payment Plan Option', 20, yPosition + 3);
+  yPosition += 8;
+
+  pdf.setFontSize(7);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('No testing or materials fees. Flexible scheduling. Fixed 10% discount on total hours.', 20, yPosition);
+  yPosition += 6;
+
+  // Calculate payment plan totals
+  const standardTotal = totalHours * hourlyRate;
+  const discountedTotal = standardTotal * 0.9; // 10% discount
+  const adjustedHourlyRate = discountedTotal / totalHours;
+  const savings = standardTotal - discountedTotal;
+
+  // First chart - Prepay-style with fixed discount
+  pdf.setFontSize(10);
+  pdf.setTextColor(34, 197, 94);
+  pdf.text('Total Cost with 10% Discount', 20, yPosition);
+  yPosition += 4;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours', 'Adj. Rate', 'Total Cost', 'Discount', 'Savings']],
+    body: [[
+      totalHours.toString(),
+      `$${adjustedHourlyRate.toFixed(2)}`,
+      `$${Math.round(discountedTotal)}`,
+      '10%',
+      `$${Math.round(savings)}`
+    ]],
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 10;
+
+  // Second chart - Payment terms
+  pdf.setFontSize(10);
+  pdf.setTextColor(34, 197, 94);
+  pdf.text('Payment Terms', 20, yPosition);
+  yPosition += 4;
+
+  // Calculate monthly payments for different terms
+  const paymentTerms = [
+    { months: 12, interest: '0%', monthly: discountedTotal / 12 },
+    { months: 18, interest: '0%', monthly: discountedTotal / 18 },
+    { months: 24, interest: '0%', monthly: discountedTotal / 24 },
+    { months: 36, interest: '5.99 - 19.99%', monthly: (discountedTotal * 1.1299) / 36 }, // Average 12.99% interest
+    { months: 48, interest: '6.99 - 19.99%', monthly: (discountedTotal * 1.1349) / 48 }, // Average 13.49% interest
+  ];
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Months', 'Interest', 'Monthly']],
+    body: paymentTerms.map(({ months, interest, monthly }) => [
+      months.toString(),
+      interest,
+      `$${Math.round(monthly)}`
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+
+  // Section 3: Prepay Tuition Option (Orange theme) - Moved to bottom
+  pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+
+  pdf.setFontSize(13);
+  pdf.setTextColor(242, 106, 49); // Brand orange
+  pdf.text('Prepay Tuition Option', 20, yPosition + 3);
+  yPosition += 8;
+
+  pdf.setFontSize(7);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('No testing or materials fees. Flexible scheduling. Fixed 20% discount on total hours.', 20, yPosition);
+  yPosition += 4;
+
+  // Calculate prepay totals with 20% discount
+  const prepayDiscountedTotal = standardTotal * 0.8; // 20% discount
+  const prepayAdjustedHourlyRate = prepayDiscountedTotal / totalHours;
+  const prepaySavings = standardTotal - prepayDiscountedTotal;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours', 'Adj. Rate', 'Total Cost', 'Discount', 'Savings']],
+    body: [[
+      totalHours.toString(),
+      `$${prepayAdjustedHourlyRate.toFixed(2)}`,
+      `$${Math.round(prepayDiscountedTotal)}`,
+      '20%',
+      `$${Math.round(prepaySavings)}`
+    ]],
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 }

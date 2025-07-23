@@ -8,6 +8,7 @@ import { SubjectHours } from "@/lib/pricingCalculations";
 
 export default function PricingGenerator() {
   const [formData, setFormData] = useState<{
+    version: string;
     hourlyRate: number;
     weeklyHours: string;
     subjects: SubjectHours;

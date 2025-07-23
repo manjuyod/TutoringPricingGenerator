@@ -5,12 +5,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Info, Book, Package, Percent } from "lucide-react";
+import { Info, Book, Package, Percent, FileText } from "lucide-react";
 import { pricingFormSchema, defaultPrepayDiscounts, defaultInterestDiscounts, type PricingFormData } from "@shared/schema";
 import { useEffect, useState } from "react";
 
 interface PricingFormProps {
   onFormDataChange: (data: {
+    version: string;
     hourlyRate: number;
     weeklyHours: string;
     subjects: {
@@ -34,6 +35,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   const form = useForm<PricingFormData>({
     resolver: zodResolver(pricingFormSchema),
     defaultValues: {
+      version: "tiered",
       hourlyRate: 0,
       weeklyHours: undefined,
       beginningReading: 0,
@@ -54,13 +56,14 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
     const isValid = form.formState.isValid && 
       watchedValues.hourlyRate > 0 && 
       !!watchedValues.weeklyHours && 
-      !!watchedValues.packageRange;
+      (watchedValues.version === "payment-plan" || !!watchedValues.packageRange);
     
     onValidityChange(isValid);
 
     if (isValid) {
-      const packages = watchedValues.packageRange!.split(',').map(Number);
+      const packages = watchedValues.packageRange ? watchedValues.packageRange.split(',').map(Number) : [];
       onFormDataChange({
+        version: watchedValues.version!,
         hourlyRate: watchedValues.hourlyRate,
         weeklyHours: watchedValues.weeklyHours!,
         subjects: {
@@ -108,6 +111,50 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   return (
     <div className="space-y-6">
       <Form {...form}>
+        {/* Version Selection */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-lg">
+              <FileText className="mr-2 h-5 w-5 tc-blue" />
+              Pricing Sheet Version
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="version"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium mb-3 block">Choose Pricing Sheet Version:</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                        <RadioGroupItem value="tiered" id="tiered" className="text-tc-blue" />
+                        <label htmlFor="tiered" className="cursor-pointer flex-1">
+                          <div className="font-medium">Tiered Pricing Sheet</div>
+                          <div className="text-sm text-gray-600">Multiple package options with varying discounts</div>
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                        <RadioGroupItem value="payment-plan" id="payment-plan" className="text-tc-blue" />
+                        <label htmlFor="payment-plan" className="cursor-pointer flex-1">
+                          <div className="font-medium">Payment Plan Pricing Sheet</div>
+                          <div className="text-sm text-gray-600">Simplified payment options with fixed discounts</div>
+                        </label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
         {/* Basic Information */}
         <Card>
           <CardHeader>
@@ -207,129 +254,133 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
           </CardContent>
         </Card>
 
-        {/* Package Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <Package className="mr-2 h-5 w-5 tc-blue" />
-              Package Selection
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FormField
-              control={form.control}
-              name="packageRange"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium mb-3 block">Choose Package Range:</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="space-y-2"
-                    >
-                      {[
-                        { value: "64,96,128,192", label: "Package A: 64, 96, 128, 192 hours" },
-                        { value: "96,128,160,192", label: "Package B: 96, 128, 160, 192 hours" },
-                        { value: "96,128,192,256", label: "Package C: 96, 128, 192, 256 hours" },
-                        { value: "128,256,320,400", label: "Package D: 128, 256, 320, 400 hours" },
-                      ].map(({ value, label }) => (
-                        <div key={value} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                          <RadioGroupItem value={value} id={value} className="text-tc-blue" />
-                          <label htmlFor={value} className="cursor-pointer flex-1">
-                            {label}
-                          </label>
-                        </div>
+        {/* Package Selection - Only show for tiered version */}
+        {watchedValues.version === "tiered" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <Package className="mr-2 h-5 w-5 tc-blue" />
+                Package Selection
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="packageRange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium mb-3 block">Choose Package Range:</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2"
+                      >
+                        {[
+                          { value: "64,96,128,192", label: "Package A: 64, 96, 128, 192 hours" },
+                          { value: "96,128,160,192", label: "Package B: 96, 128, 160, 192 hours" },
+                          { value: "96,128,192,256", label: "Package C: 96, 128, 192, 256 hours" },
+                          { value: "128,256,320,400", label: "Package D: 128, 256, 320, 400 hours" },
+                        ].map(({ value, label }) => (
+                          <div key={value} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                            <RadioGroupItem value={value} id={value} className="text-tc-blue" />
+                            <label htmlFor={value} className="cursor-pointer flex-1">
+                              {label}
+                            </label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Discount Configuration - Only show for tiered version */}
+        {watchedValues.version === "tiered" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <Percent className="mr-2 h-5 w-5 tc-orange" />
+                Discount Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {packages.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Prepay Discounts */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
+                    <div className="space-y-3">
+                      {packages.map(pkg => (
+                        <FormField
+                          key={`prepay-${pkg}`}
+                          control={form.control}
+                          name={`prepayDiscounts.${pkg}` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder={defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts]?.toString() || "0"}
+                                  step="1"
+                                  min="0"
+                                  max="100"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                    </div>
+                  </div>
+
+                  {/* Interest Discounts */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
+                    <div className="space-y-3">
+                      {packages.map(pkg => (
+                        <FormField
+                          key={`interest-${pkg}`}
+                          control={form.control}
+                          name={`interestDiscounts.${pkg}` as any}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
+                                  step="1"
+                                  min="0"
+                                  max="100"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600">Select a package range above to configure discounts.</p>
               )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Discount Configuration */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg">
-              <Percent className="mr-2 h-5 w-5 tc-orange" />
-              Discount Configuration
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {packages.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Prepay Discounts */}
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
-                  <div className="space-y-3">
-                    {packages.map(pkg => (
-                      <FormField
-                        key={`prepay-${pkg}`}
-                        control={form.control}
-                        name={`prepayDiscounts.${pkg}` as any}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder={defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts]?.toString() || "0"}
-                                step="1"
-                                min="0"
-                                max="100"
-                                {...field}
-                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Interest Discounts */}
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
-                  <div className="space-y-3">
-                    {packages.map(pkg => (
-                      <FormField
-                        key={`interest-${pkg}`}
-                        control={form.control}
-                        name={`interestDiscounts.${pkg}` as any}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
-                                step="1"
-                                min="0"
-                                max="100"
-                                {...field}
-                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">Select a package range above to configure discounts.</p>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </Form>
     </div>
   );
