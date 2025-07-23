@@ -318,11 +318,6 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   const savings = standardTotal - discountedTotal;
 
   // First chart - Prepay-style with fixed discount
-  pdf.setFontSize(10);
-  pdf.setTextColor(249, 197, 70);
-  pdf.text('Total Cost with 10% Discount', 20, yPosition);
-  yPosition += 4;
-
   autoTable(pdf, {
     startY: yPosition,
     head: [['Hours', 'Adj. Rate', 'Total Cost', 'Discount', 'Savings']],
