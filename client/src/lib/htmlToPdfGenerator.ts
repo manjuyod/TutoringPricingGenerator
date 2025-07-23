@@ -128,6 +128,25 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   let yPosition = 40;
 
+  // Total Recommended Hours box
+  pdf.setFillColor(230, 244, 255); // Light blue background
+  pdf.rect(145, yPosition - 5, 50, 20, 'F');
+  pdf.setLineWidth(2);
+  pdf.setDrawColor(0, 99, 168);
+  pdf.rect(145, yPosition - 5, 50, 20);
+  
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 99, 168);
+  pdf.text('Total Recommended Hours', 170, yPosition);
+  
+  // Calculate total hours from prepay options (first option has the total)
+  const totalHours = prepayOptions.length > 0 ? prepayOptions[0].hours : 0;
+  pdf.setFontSize(16);
+  pdf.setTextColor(242, 106, 49);
+  pdf.text(totalHours.toString(), 170, yPosition + 10, { align: 'center' });
+
+  yPosition += 25;
+
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
   pdf.rect(15, yPosition - 2, 180, 16, 'F');
@@ -266,6 +285,23 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   pdf.text('Simplified payment solutions for your convenience', 20, 28);
 
   let yPosition = 40;
+
+  // Total Recommended Hours box
+  pdf.setFillColor(230, 244, 255); // Light blue background
+  pdf.rect(145, yPosition - 5, 50, 20, 'F');
+  pdf.setLineWidth(2);
+  pdf.setDrawColor(0, 99, 168);
+  pdf.rect(145, yPosition - 5, 50, 20);
+  
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 99, 168);
+  pdf.text('Total Recommended Hours', 170, yPosition);
+  
+  pdf.setFontSize(16);
+  pdf.setTextColor(242, 106, 49);
+  pdf.text(totalHours.toString(), 170, yPosition + 10, { align: 'center' });
+
+  yPosition += 25;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
