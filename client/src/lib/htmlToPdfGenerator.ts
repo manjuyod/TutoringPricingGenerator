@@ -297,18 +297,18 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
 
   yPosition = (pdf as any).lastAutoTable.finalY + 14;
 
-  // Section 2: Payment Plan Option (Green theme)
-  pdf.setFillColor(240, 253, 244); // Light green background
+  // Section 2: Payment Plan Option (Yellow theme)
+  pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
   pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
   pdf.setFontSize(13);
-  pdf.setTextColor(34, 197, 94); // Green color
+  pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('Payment Plan Option', 20, yPosition + 3);
   yPosition += 8;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing or materials fees. Flexible scheduling. Fixed 10% discount on total hours.', 20, yPosition);
+  pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
   yPosition += 6;
 
   // Calculate payment plan totals
@@ -319,7 +319,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
 
   // First chart - Prepay-style with fixed discount
   pdf.setFontSize(10);
-  pdf.setTextColor(34, 197, 94);
+  pdf.setTextColor(249, 197, 70);
   pdf.text('Total Cost with 10% Discount', 20, yPosition);
   yPosition += 4;
 
@@ -335,7 +335,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
     ]],
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 
@@ -343,7 +343,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
 
   // Second chart - Payment terms
   pdf.setFontSize(10);
-  pdf.setTextColor(34, 197, 94);
+  pdf.setTextColor(249, 197, 70);
   pdf.text('Payment Terms', 20, yPosition);
   yPosition += 4;
 
@@ -352,21 +352,29 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
     { months: 12, interest: '0%', monthly: discountedTotal / 12 },
     { months: 18, interest: '0%', monthly: discountedTotal / 18 },
     { months: 24, interest: '0%', monthly: discountedTotal / 24 },
-    { months: 36, interest: '5.99 - 19.99%', monthly: (discountedTotal * 1.1299) / 36 }, // Average 12.99% interest
-    { months: 48, interest: '6.99 - 19.99%', monthly: (discountedTotal * 1.1349) / 48 }, // Average 13.49% interest
+    { months: 36, interest: '5.99 - 19.99%', monthlyLow: (discountedTotal * 1.0599) / 36, monthlyHigh: (discountedTotal * 1.1999) / 36 }, // 5.99% to 19.99% interest
+    { months: 48, interest: '6.99 - 19.99%', monthlyLow: (discountedTotal * 1.0699) / 48, monthlyHigh: (discountedTotal * 1.1999) / 48 }, // 6.99% to 19.99% interest
   ];
 
   autoTable(pdf, {
     startY: yPosition,
     head: [['Months', 'Interest', 'Monthly']],
-    body: paymentTerms.map(({ months, interest, monthly }) => [
-      months.toString(),
-      interest,
-      `$${Math.round(monthly)}`
-    ]),
+    body: paymentTerms.map(({ months, interest, monthly, monthlyLow, monthlyHigh }) => {
+      let monthlyDisplay;
+      if (monthlyLow !== undefined && monthlyHigh !== undefined) {
+        monthlyDisplay = `$${Math.round(monthlyLow)} - $${Math.round(monthlyHigh)}`;
+      } else {
+        monthlyDisplay = `$${Math.round(monthly)}`;
+      }
+      return [
+        months.toString(),
+        interest,
+        monthlyDisplay
+      ];
+    }),
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 
@@ -383,10 +391,11 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing or materials fees. Flexible scheduling. Fixed 20% discount on total hours.', 20, yPosition);
+  pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
   yPosition += 4;
 
   // Calculate prepay totals with 20% discount
+  const standardTotal = totalHours * hourlyRate;
   const prepayDiscountedTotal = standardTotal * 0.8; // 20% discount
   const prepayAdjustedHourlyRate = prepayDiscountedTotal / totalHours;
   const prepaySavings = standardTotal - prepayDiscountedTotal;
@@ -585,7 +594,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   // Draw axes
   ctx.strokeStyle = '#374151';
   ctx.lineWidth = 2;
-  
+
   // Y-axis (left side)
   ctx.beginPath();
   ctx.moveTo(leftPadding, padding);
@@ -604,11 +613,11 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
-  
+
   const monthStepSize = Math.ceil(maxMonths / 6);
   for (let i = 0; i <= maxMonths; i += monthStepSize) {
     const x = leftPadding + (i / maxMonths) * chartWidth;
-    
+
     // Draw grid line
     if (i > 0) {
       ctx.beginPath();
@@ -616,7 +625,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
       ctx.lineTo(x, padding + chartHeight);
       ctx.stroke();
     }
-    
+
     // Draw label
     ctx.fillText(i.toString(), x, padding + chartHeight + 20);
   }
