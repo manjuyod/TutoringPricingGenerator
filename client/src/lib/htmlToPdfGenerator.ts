@@ -130,8 +130,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.setTextColor(0, 99, 168);
   pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
   
-  // Calculate total hours from prepay options (first option has the total)
-  const totalHours = prepayOptions.length > 0 ? prepayOptions[0].hours : 0;
+  // Use totalHours from Academic Game Plan page
   pdf.setFontSize(14);
   pdf.setTextColor(242, 106, 49);
   pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
