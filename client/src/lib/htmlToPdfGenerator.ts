@@ -124,12 +124,12 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.roundedRect(155, 8, 40, 20, 3, 3, 'S'); // Rounded corners, no fill, narrower width
-  
+  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
   pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
-  
+
   // Use totalHours from Academic Game Plan page
   pdf.setFontSize(14);
   pdf.setTextColor(242, 106, 49);
@@ -277,12 +277,12 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.roundedRect(155, 8, 40, 20, 3, 3, 'S'); // Rounded corners, no fill, narrower width
-  
+  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
   pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
-  
+
   pdf.setFontSize(14);
   pdf.setTextColor(242, 106, 49);
   pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
@@ -632,6 +632,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   // Draw grid lines and X-axis labels (months)
   ctx.strokeStyle = '#f3f4f6';
   ctx.lineWidth = 0.5;
+```text
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
