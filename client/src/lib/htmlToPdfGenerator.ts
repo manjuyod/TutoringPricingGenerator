@@ -161,7 +161,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing or registration fees. Flexible scheduling.', 20, yPosition);
+  pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
   yPosition += 4;
 
   autoTable(pdf, {
