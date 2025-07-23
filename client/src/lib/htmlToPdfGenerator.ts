@@ -122,21 +122,19 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   pdf.text('Tuition Payment Options', 20, 20);
 
   // Total Recommended Hours box - positioned inline with title
-  pdf.setFillColor(230, 244, 255); // Light blue background
-  pdf.rect(145, 8, 50, 20, 'F');
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(145, 8, 50, 20);
+  pdf.roundedRect(155, 8, 40, 20, 3, 3, 'S'); // Rounded corners, no fill, narrower width
   
-  pdf.setFontSize(8);
+  pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Total Recommended Hours', 170, 15, { align: 'center' });
+  pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
   
   // Calculate total hours from prepay options (first option has the total)
   const totalHours = prepayOptions.length > 0 ? prepayOptions[0].hours : 0;
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.setTextColor(242, 106, 49);
-  pdf.text(totalHours.toString(), 170, 23, { align: 'center' });
+  pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
 
   // Add subtitle
   pdf.setFontSize(10);
@@ -278,19 +276,17 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   pdf.text('Tuition Payment Options', 20, 20);
 
   // Total Recommended Hours box - positioned inline with title
-  pdf.setFillColor(230, 244, 255); // Light blue background
-  pdf.rect(145, 8, 50, 20, 'F');
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(145, 8, 50, 20);
+  pdf.roundedRect(155, 8, 40, 20, 3, 3, 'S'); // Rounded corners, no fill, narrower width
   
-  pdf.setFontSize(8);
+  pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Total Recommended Hours', 170, 15, { align: 'center' });
+  pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
   
-  pdf.setFontSize(16);
+  pdf.setFontSize(14);
   pdf.setTextColor(242, 106, 49);
-  pdf.text(totalHours.toString(), 170, 23, { align: 'center' });
+  pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
 
   // Add subtitle
   pdf.setFontSize(10);
