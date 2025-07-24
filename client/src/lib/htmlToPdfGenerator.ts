@@ -35,7 +35,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   } else {
     const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
     const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
-    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions);
+    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions, totalHours);
   }
 
   // Save the PDF
@@ -114,7 +114,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   twelveMonth: FinancingOption[];
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
-}) {
+}, totalHours: number) {
   // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
@@ -632,7 +632,6 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   // Draw grid lines and X-axis labels (months)
   ctx.strokeStyle = '#f3f4f6';
   ctx.lineWidth = 0.5;
-```text
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
