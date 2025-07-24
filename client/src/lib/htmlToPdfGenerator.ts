@@ -6,17 +6,32 @@ import { LOGO_B64 } from './generatedAssets';
 
 // Helper function to draw rounded rectangle
 function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
-  pdf.lines([
-    [radius, 0],
-    [width - 2 * radius, 0],
-    [radius, 0, radius, radius, 0, radius],
-    [0, height - 2 * radius],
-    [0, radius, -radius, radius, -radius, 0],
-    [-(width - 2 * radius), 0],
-    [-radius, 0, -radius, -radius, 0, -radius],
-    [0, -(height - 2 * radius)],
-    [0, -radius, radius, -radius, radius, 0]
-  ], x + radius, y);
+  // Start path
+  pdf.moveTo(x + radius, y);
+  
+  // Top edge
+  pdf.lineTo(x + width - radius, y);
+  
+  // Top-right corner
+  pdf.quadraticCurveTo(x + width, y, x + width, y + radius);
+  
+  // Right edge
+  pdf.lineTo(x + width, y + height - radius);
+  
+  // Bottom-right corner
+  pdf.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  
+  // Bottom edge
+  pdf.lineTo(x + radius, y + height);
+  
+  // Bottom-left corner
+  pdf.quadraticCurveTo(x, y + height, x, y + height - radius);
+  
+  // Left edge
+  pdf.lineTo(x, y + radius);
+  
+  // Top-left corner
+  pdf.quadraticCurveTo(x, y, x + radius, y);
 }
 
 interface PdfFormData {
