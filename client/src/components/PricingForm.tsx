@@ -136,14 +136,14 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                         <RadioGroupItem value="tiered" id="tiered" className="text-tc-blue" />
                         <label htmlFor="tiered" className="cursor-pointer flex-1">
                           <div className="font-medium">Tiered Pricing Sheet</div>
-                          <div className="text-sm text-gray-600">Multiple package options with varying discounts</div>
+                          <div className="text-sm text-gray-600">Emphasizes various hours packages. Often used for TutorUp and High School.</div>
                         </label>
                       </div>
                       <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                         <RadioGroupItem value="payment-plan" id="payment-plan" className="text-tc-blue" />
                         <label htmlFor="payment-plan" className="cursor-pointer flex-1">
                           <div className="font-medium">Payment Plan Pricing Sheet</div>
-                          <div className="text-sm text-gray-600">Simplified payment options with fixed discounts</div>
+                          <div className="text-sm text-gray-600">Focuses on various payment options. Best parents with a focused goal.</div>
                         </label>
                       </div>
                     </RadioGroup>
