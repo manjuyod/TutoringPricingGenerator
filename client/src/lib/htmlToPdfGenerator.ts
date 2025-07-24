@@ -4,6 +4,21 @@ import autoTable from 'jspdf-autotable';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
+// Helper function to draw rounded rectangle
+function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
+  pdf.lines([
+    [radius, 0],
+    [width - 2 * radius, 0],
+    [radius, 0, radius, radius, 0, radius],
+    [0, height - 2 * radius],
+    [0, radius, -radius, radius, -radius, 0],
+    [-(width - 2 * radius), 0],
+    [-radius, 0, -radius, -radius, 0, -radius],
+    [0, -(height - 2 * radius)],
+    [0, -radius, radius, -radius, radius, 0]
+  ], x + radius, y);
+}
+
 interface PdfFormData {
   version: string;
   hourlyRate: number;
@@ -124,7 +139,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
+  pdf.stroke();
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
@@ -277,7 +293,8 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
+  pdf.stroke();
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
