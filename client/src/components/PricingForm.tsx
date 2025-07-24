@@ -143,7 +143,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                         <RadioGroupItem value="payment-plan" id="payment-plan" className="text-tc-blue" />
                         <label htmlFor="payment-plan" className="cursor-pointer flex-1">
                           <div className="font-medium">Payment Plan Pricing Sheet</div>
-                          <div className="text-sm text-gray-600">Focuses on various payment options. Best parents with a focused goal.</div>
+                          <div className="text-sm text-gray-600">Focuses on various payment options. Best for parents with a focused goal.</div>
                         </label>
                       </div>
                     </RadioGroup>
