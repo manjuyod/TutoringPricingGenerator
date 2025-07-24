@@ -4,36 +4,6 @@ import autoTable from 'jspdf-autotable';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
-// Helper function to draw rounded rectangle
-function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
-  // Start path
-  pdf.moveTo(x + radius, y);
-  
-  // Top edge
-  pdf.lineTo(x + width - radius, y);
-  
-  // Top-right corner
-  pdf.quadraticCurveTo(x + width, y, x + width, y + radius);
-  
-  // Right edge
-  pdf.lineTo(x + width, y + height - radius);
-  
-  // Bottom-right corner
-  pdf.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  
-  // Bottom edge
-  pdf.lineTo(x + radius, y + height);
-  
-  // Bottom-left corner
-  pdf.quadraticCurveTo(x, y + height, x, y + height - radius);
-  
-  // Left edge
-  pdf.lineTo(x, y + radius);
-  
-  // Top-left corner
-  pdf.quadraticCurveTo(x, y, x + radius, y);
-}
-
 interface PdfFormData {
   version: string;
   hourlyRate: number;
@@ -65,7 +35,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   } else {
     const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
     const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
-    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions, totalHours);
+    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions);
   }
 
   // Save the PDF
@@ -144,7 +114,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   twelveMonth: FinancingOption[];
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
-}, totalHours: number) {
+}) {
   // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
@@ -154,8 +124,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
-  pdf.stroke();
+  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
@@ -308,8 +277,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
-  pdf.stroke();
+  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
@@ -664,6 +632,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   // Draw grid lines and X-axis labels (months)
   ctx.strokeStyle = '#f3f4f6';
   ctx.lineWidth = 0.5;
+```text
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
