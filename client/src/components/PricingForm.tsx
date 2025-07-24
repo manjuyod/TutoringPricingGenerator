@@ -82,11 +82,11 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   }, [watchedValues, form.formState.isValid, onFormDataChange, onValidityChange]);
 
   useEffect(() => {
-    if (watchedValues.packageRange && watchedValues.packageRange !== selectedPackageRange) {
+    if (watchedValues.version === "tiered" && watchedValues.packageRange && watchedValues.packageRange !== selectedPackageRange) {
       setSelectedPackageRange(watchedValues.packageRange);
       const packages = watchedValues.packageRange.split(',');
       
-      // Set default discount values
+      // Set default discount values for tiered version
       const newPrepayDiscounts: Record<string, number> = {};
       const newInterestDiscounts: Record<string, number> = {};
       
@@ -97,8 +97,12 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
       
       form.setValue('prepayDiscounts', newPrepayDiscounts);
       form.setValue('interestDiscounts', newInterestDiscounts);
+    } else if (watchedValues.version === "payment-plan") {
+      // Set default discount values for payment plan version
+      form.setValue('prepayDiscounts', { general: 10 });
+      form.setValue('interestDiscounts', { general: 5 });
     }
-  }, [watchedValues.packageRange, selectedPackageRange, form]);
+  }, [watchedValues.packageRange, watchedValues.version, selectedPackageRange, form]);
 
   // Generate hour options (16-400 in increments of 16)
   const hourOptions: number[] = [];
@@ -299,8 +303,8 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
           </Card>
         )}
 
-        {/* Discount Configuration - Only show for tiered version */}
-        {watchedValues.version === "tiered" && (
+        {/* Discount Configuration - Show for both versions */}
+        {(watchedValues.version === "tiered" || watchedValues.version === "payment-plan") && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
@@ -309,74 +313,133 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {packages.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Prepay Discounts */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
-                    <div className="space-y-3">
-                      {packages.map(pkg => (
-                        <FormField
-                          key={`prepay-${pkg}`}
-                          control={form.control}
-                          name={`prepayDiscounts.${pkg}` as any}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder={defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts]?.toString() || "0"}
-                                  step="1"
-                                  min="0"
-                                  max="100"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                  className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      ))}
+              {watchedValues.version === "tiered" ? (
+                packages.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Prepay Discounts */}
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
+                      <div className="space-y-3">
+                        {packages.map(pkg => (
+                          <FormField
+                            key={`prepay-${pkg}`}
+                            control={form.control}
+                            name={`prepayDiscounts.${pkg}` as any}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder={defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts]?.toString() || "0"}
+                                    step="1"
+                                    min="0"
+                                    max="100"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
                     </div>
+
+                    {/* Interest Discounts */}
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
+                      <div className="space-y-3">
+                        {packages.map(pkg => (
+                          <FormField
+                            key={`interest-${pkg}`}
+                            control={form.control}
+                            name={`interestDiscounts.${pkg}` as any}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
+                                    step="1"
+                                    min="0"
+                                    max="100"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600">Select a package range above to configure discounts.</p>
+                )
+              ) : (
+                // Payment Plan version discount configuration
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Prepay Discount */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Prepay Discount (%)</h4>
+                    <FormField
+                      control={form.control}
+                      name="prepayDiscounts.general"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Prepay Discount (%)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="10"
+                              step="1"
+                              min="0"
+                              max="100"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
-                  {/* Interest Discounts */}
+                  {/* Interest Discount */}
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
-                    <div className="space-y-3">
-                      {packages.map(pkg => (
-                        <FormField
-                          key={`interest-${pkg}`}
-                          control={form.control}
-                          name={`interestDiscounts.${pkg}` as any}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
-                                  step="1"
-                                  min="0"
-                                  max="100"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                  className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
+                    <h4 className="font-medium text-gray-900 mb-3">0% Interest Discount (12 month) (%)</h4>
+                    <FormField
+                      control={form.control}
+                      name="interestDiscounts.general"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Interest Discount (%)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="5"
+                              step="1"
+                              min="0"
+                              max="100"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-600">Select a package range above to configure discounts.</p>
               )}
             </CardContent>
           </Card>
