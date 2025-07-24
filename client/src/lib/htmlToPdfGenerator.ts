@@ -124,7 +124,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
@@ -277,7 +277,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  pdf.rect(155, 8, 40, 20, 'S'); // Regular rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 99, 168);
@@ -630,9 +630,9 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.stroke();
 
   // Draw grid lines and X-axis labels (months)
-  ctx.strokeStyle = '#f3f4f6';
+  ctx.strokeStyle = '#f3f4f4f6';
   ctx.lineWidth = 0.5;
-  
+
   ctx.fillStyle = '#6b7280';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
@@ -692,4 +692,9 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.rotate(-Math.PI / 2);
   ctx.fillText('Hours per Week', 0, 0);
   ctx.restore();
+}
+
+// Helper function to draw rounded rectangle
+function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
+  pdf.roundedRect(x, y, width, height, radius, radius, 'S');
 }
