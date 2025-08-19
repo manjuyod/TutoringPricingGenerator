@@ -354,7 +354,8 @@ async function generatePaymentPlanPage2(
 
   // Calculate payment plan totals
   const standardTotal = totalHours * hourlyRate;
-  const discountedTotal = standardTotal * 0.9; // 10% discount
+  const interestDiscount = interestDiscounts.general || 5; // Use custom discount or default to 5%
+  const discountedTotal = standardTotal * (1 - interestDiscount / 100);
   const adjustedHourlyRate = discountedTotal / totalHours;
   const savings = standardTotal - discountedTotal;
 
@@ -366,7 +367,7 @@ async function generatePaymentPlanPage2(
       totalHours.toString(),
       `$${adjustedHourlyRate.toFixed(2)}`,
       `$${Math.round(discountedTotal)}`,
-      '10%',
+      `${interestDiscount}%`,
       `$${Math.round(savings)}`
     ]],
     theme: 'grid',
