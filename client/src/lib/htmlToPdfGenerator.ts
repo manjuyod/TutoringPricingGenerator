@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
+import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
@@ -12,6 +12,13 @@ interface PdfFormData {
   packages: number[];
   prepayDiscounts: Record<string, number>;
   interestDiscounts: Record<string, number>;
+}
+
+// Define the MonthlyPaymentOption interface for clarity in generatePaymentPlanPage2
+interface MonthlyPaymentOption {
+  hoursPerWeek: number;
+  monthlyCost: number;
+  hourlyRate: number;
 }
 
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
@@ -31,7 +38,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   // Page 2: Payment Options (different based on version)
   pdf.addPage();
   if (version === "payment-plan") {
-    await generatePaymentPlanPage2(pdf, monthlyOptions, totalHours, hourlyRate);
+    await generatePaymentPlanPage2(pdf, monthlyOptions, totalHours, hourlyRate, prepayDiscounts, interestDiscounts);
   } else {
     const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
     const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
@@ -39,8 +46,8 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
   }
 
   // Save the PDF
-  const filename = version === "payment-plan" ? 
-    'tutoring-club-payment-plan-pricing.pdf' : 
+  const filename = version === "payment-plan" ?
+    'tutoring-club-payment-plan-pricing.pdf' :
     'tutoring-club-tiered-pricing.pdf';
   pdf.save(filename);
 }
@@ -63,8 +70,8 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
       <!-- Description -->
       <div style="margin-bottom: 30px; background: #f8fafc; border-left: 4px solid #0063a8; padding: 20px; border-radius: 8px;">
         <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0; font-style: italic;">
-          At Tutoring Club, we believe every student has the potential to thrive—with the right support. 
-          Based on your academic goals and our in-depth assessment, we've put together a customized roadmap 
+          At Tutoring Club, we believe every student has the potential to thrive—with the right support.
+          Based on your academic goals and our in-depth assessment, we've put together a customized roadmap
           designed to close learning gaps, build confidence, and get results.
         </p>
       </div>
@@ -110,7 +117,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
   await renderHtmlToPdf(pdf, htmlContent, timeline);
 }
 
-async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: any[], financingOptions: { 
+async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[], prepayOptions: any[], financingOptions: {
   twelveMonth: FinancingOption[];
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
@@ -267,7 +274,14 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: any[], prepayOptions: a
   });
 }
 
-async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], totalHours: number, hourlyRate: number) {
+async function generatePaymentPlanPage2(
+  pdf: jsPDF,
+  monthlyOptions: MonthlyPaymentOption[],
+  totalHours: number,
+  hourlyRate: number,
+  prepayDiscounts: Record<string, number> = {},
+  interestDiscounts: Record<string, number> = {}
+): Promise<void> {
   // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
@@ -418,9 +432,11 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
 
   // Calculate prepay totals with 20% discount
   const prepayStandardTotal = totalHours * hourlyRate;
-  const prepayDiscountedTotal = prepayStandardTotal * 0.8; // 20% discount
+  const prepayDiscount = prepayDiscounts.general || 20; // Use custom discount or default to 20%
+  const prepayDiscountedTotal = prepayStandardTotal * (1 - prepayDiscount / 100);
   const prepayAdjustedHourlyRate = prepayDiscountedTotal / totalHours;
   const prepaySavings = prepayStandardTotal - prepayDiscountedTotal;
+
 
   autoTable(pdf, {
     startY: yPosition,
@@ -429,7 +445,7 @@ async function generatePaymentPlanPage2(pdf: jsPDF, monthlyOptions: any[], total
       totalHours.toString(),
       `$${prepayAdjustedHourlyRate.toFixed(2)}`,
       `$${Math.round(prepayDiscountedTotal)}`,
-      '20%',
+      `${prepayDiscount}%`,
       `$${Math.round(prepaySavings)}`
     ]],
     theme: 'grid',
@@ -701,7 +717,7 @@ function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height
   const y1 = y;
   const x2 = x + width;
   const y2 = y + height;
-  
+
   pdf.internal.write([
     (x1 + radius) * k, (pdf.internal.pageSize.height - y1) * k, 'm',
     (x2 - radius) * k, (pdf.internal.pageSize.height - y1) * k, 'l',
