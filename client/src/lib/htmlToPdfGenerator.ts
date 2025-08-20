@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, FinancingOption } from './pricingCalculations';
+import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
@@ -22,15 +22,29 @@ interface MonthlyPaymentOption {
 }
 
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
-  const { version, hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
+  try {
+    const { version, hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
 
-  // Calculate all the data we need
-  const totalHours = calculateTotalHours(subjects);
-  const selectedSubjects = getSelectedSubjects(subjects);
-  const timeline = calculateTimeline(totalHours, weeklyHours);
-  const monthlyOptions = calculateMonthlyPaymentOptions(hourlyRate, weeklyHours);
+    // Validate input data
+    if (!version || !hourlyRate || !weeklyHours || !subjects) {
+      throw new Error('Missing required form data');
+    }
 
-  const pdf = new jsPDF('p', 'mm', 'a4');
+    // Calculate all the data we need
+    const totalHours = calculateTotalHours(subjects);
+    const selectedSubjects = getSelectedSubjects(subjects);
+    const timeline = calculateTimeline(totalHours, weeklyHours);
+    const monthlyOptions = calculateMonthlyPaymentOptions(hourlyRate, weeklyHours);
+
+    if (totalHours === 0) {
+      throw new Error('No subjects selected or total hours is zero');
+    }
+
+    if (!monthlyOptions || monthlyOptions.length === 0) {
+      throw new Error('Failed to calculate monthly payment options');
+    }
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
 
   // Page 1: Academic Game Plan (same for both versions)
   await generatePage1(pdf, selectedSubjects, totalHours, timeline);
@@ -50,6 +64,10 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
     'tutoring-club-payment-plan-pricing.pdf' :
     'tutoring-club-tiered-pricing.pdf';
   pdf.save(filename);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw new Error(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[]) {

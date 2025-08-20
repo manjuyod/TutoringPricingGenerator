@@ -27,6 +27,7 @@ export default function PDFGenerator({ formData, isValid }: PDFGeneratorProps) {
         await generateAdvancedPricingPDF(formData);
       } catch (error) {
         console.error('Error generating PDF:', error);
+        alert(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
       } finally {
         setIsGenerating(false);
       }
