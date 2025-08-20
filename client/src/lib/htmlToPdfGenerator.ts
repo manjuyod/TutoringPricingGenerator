@@ -645,7 +645,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
   ctx.textAlign = 'center';
   ctx.fillText('Estimated Time to Achieve Academic Goals', canvas.width / 2, 30);
 
-  // Colors for different bars (reversed so bottom is darkest, top is lightest)
+  // Colors for different bars - all orange variants from light to dark
   const colors = ['#ffcaa0', '#ffab7d', '#ff8c5a', '#f26a31'];
 
   // Draw axes
@@ -694,7 +694,7 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
     const barWidth = (months / maxMonths) * chartWidth;
 
     // Draw bar
-    ctx.fillStyle = colors[index] || '#0063a8';
+    ctx.fillStyle = colors[index] || '#f26a31';
     ctx.fillRect(leftPadding, barY, barWidth, barHeight);
 
     // Add border to bar
