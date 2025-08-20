@@ -195,7 +195,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
@@ -227,7 +227,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
@@ -241,7 +241,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
-  yPosition += 6;
+  yPosition += 5;
 
   // 12 Month Plan
   pdf.setFontSize(9);
@@ -266,7 +266,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 10;
+  yPosition = (pdf as any).lastAutoTable.finalY + 6;
 
   // 18 Month Plan
   pdf.setFontSize(9);
@@ -354,7 +354,7 @@ async function generatePaymentPlanPage2(
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 2: Payment Plan Option (Yellow theme)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
@@ -368,7 +368,7 @@ async function generatePaymentPlanPage2(
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
-  yPosition += 6;
+  yPosition += 4;
 
   // Calculate payment plan totals
   const standardTotal = totalHours * hourlyRate;
@@ -394,7 +394,7 @@ async function generatePaymentPlanPage2(
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 10;
+  yPosition = (pdf as any).lastAutoTable.finalY + 6;
 
   // Second chart - Payment terms
   pdf.setFontSize(10);
@@ -433,7 +433,7 @@ async function generatePaymentPlanPage2(
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 14;
+  yPosition = (pdf as any).lastAutoTable.finalY + 8;
 
   // Section 3: Prepay Tuition Option (Orange theme) - Moved to bottom
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange

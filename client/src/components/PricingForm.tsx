@@ -37,14 +37,14 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
     defaultValues: {
       version: "tiered",
       hourlyRate: 0,
-      weeklyHours: undefined,
+      weeklyHours: "",
       beginningReading: 0,
       reading: 0,
       writing: 0,
       math: 0,
       tutorUp: 0,
       testPrep: 0,
-      packageRange: undefined,
+      packageRange: "",
       prepayDiscounts: {},
       interestDiscounts: {},
     },
@@ -53,10 +53,9 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   const watchedValues = form.watch();
 
   useEffect(() => {
-    const isValid = form.formState.isValid &&
-      watchedValues.hourlyRate > 0 &&
-      !!watchedValues.weeklyHours &&
-      (watchedValues.version === "payment-plan" || !!watchedValues.packageRange);
+    const hasValidBasicInfo = watchedValues.hourlyRate > 0 && !!watchedValues.weeklyHours;
+    const hasValidPackages = watchedValues.version === "payment-plan" || !!watchedValues.packageRange;
+    const isValid = hasValidBasicInfo && hasValidPackages;
 
     onValidityChange(isValid);
 
@@ -67,19 +66,19 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
         hourlyRate: watchedValues.hourlyRate,
         weeklyHours: watchedValues.weeklyHours!,
         subjects: {
-          "Beginning Reading/Phonics": watchedValues.beginningReading,
-          "Reading": watchedValues.reading,
-          "Writing": watchedValues.writing,
-          "Math": watchedValues.math,
-          "TutorUp": watchedValues.tutorUp,
-          "Test Prep": watchedValues.testPrep,
+          "Beginning Reading/Phonics": watchedValues.beginningReading || 0,
+          "Reading": watchedValues.reading || 0,
+          "Writing": watchedValues.writing || 0,
+          "Math": watchedValues.math || 0,
+          "TutorUp": watchedValues.tutorUp || 0,
+          "Test Prep": watchedValues.testPrep || 0,
         },
         packages,
-        prepayDiscounts: watchedValues.prepayDiscounts,
-        interestDiscounts: watchedValues.interestDiscounts,
+        prepayDiscounts: watchedValues.prepayDiscounts || {},
+        interestDiscounts: watchedValues.interestDiscounts || {},
       });
     }
-  }, [watchedValues, form.formState.isValid, onFormDataChange, onValidityChange]);
+  }, [watchedValues, onFormDataChange, onValidityChange]);
 
   useEffect(() => {
     if (watchedValues.version === "tiered" && watchedValues.packageRange && watchedValues.packageRange !== selectedPackageRange) {
@@ -98,11 +97,15 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
       form.setValue('prepayDiscounts', newPrepayDiscounts);
       form.setValue('interestDiscounts', newInterestDiscounts);
     } else if (watchedValues.version === "payment-plan") {
-      // Set default discount values for payment plan version
-      form.setValue('prepayDiscounts', { general: 10 });
-      form.setValue('interestDiscounts', { general: 5 });
+      // Set default discount values for payment plan version only if not already set
+      if (!watchedValues.prepayDiscounts?.general) {
+        form.setValue('prepayDiscounts', { general: 20 });
+      }
+      if (!watchedValues.interestDiscounts?.general) {
+        form.setValue('interestDiscounts', { general: 5 });
+      }
     }
-  }, [watchedValues.packageRange, watchedValues.version, selectedPackageRange, form]);
+  }, [watchedValues.packageRange, watchedValues.version, selectedPackageRange, watchedValues.prepayDiscounts, watchedValues.interestDiscounts, form]);
 
   // Generate hour options (16-400 in increments of 16)
   const hourOptions: number[] = [];
