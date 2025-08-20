@@ -48,17 +48,11 @@ export function getSelectedSubjects(subjects: SubjectHours): Array<{ name: strin
 }
 
 export function calculateTimeline(totalHours: number, weeklyHoursRange: string): TimelineOption[] {
-  let hoursPerWeekOptions: number[];
-
-  if (weeklyHoursRange === "2-8") {
-    hoursPerWeekOptions = [2, 3, 4, 5, 6, 8];
-  } else if (weeklyHoursRange === "4-12") {
-    hoursPerWeekOptions = [4, 8, 10, 12];
-  } else {
-    hoursPerWeekOptions = [2, 3, 4, 5, 6, 8]; // Default fallback
-  }
-
-  return hoursPerWeekOptions.map(hoursPerWeek => ({
+  if (totalHours === 0) return [];
+  
+  const hoursOptions = weeklyHoursRange === "2-8" ? [2, 4, 6, 8] : [4, 8, 12, 16];
+  
+  return hoursOptions.map(hoursPerWeek => ({
     hoursPerWeek,
     months: Math.ceil(totalHours / (hoursPerWeek * 4))
   }));
@@ -68,17 +62,9 @@ export function calculateMonthlyPaymentOptions(
   hourlyRate: number,
   weeklyHoursRange: string
 ): MonthlyPaymentOption[] {
-  let hoursPerWeekOptions: number[];
-
-  if (weeklyHoursRange === "2-8") {
-    hoursPerWeekOptions = [2, 3, 4, 5, 6, 8];
-  } else if (weeklyHoursRange === "4-12") {
-    hoursPerWeekOptions = [4, 8, 10, 12];
-  } else {
-    hoursPerWeekOptions = [2, 3, 4, 5, 6, 8]; // Default fallback
-  }
-
-  return hoursPerWeekOptions.map(hoursPerWeek => ({
+  const hoursOptions = weeklyHoursRange === "2-8" ? [2, 4, 6, 8] : [4, 8, 12, 16];
+  
+  return hoursOptions.map(hoursPerWeek => ({
     hoursPerWeek,
     monthlyCost: hoursPerWeek * 4 * hourlyRate,
     hourlyRate
@@ -92,13 +78,13 @@ export function calculatePrepayOptions(
   customDiscounts?: Record<string, number>
 ): PrepayOption[] {
   const discounts = customDiscounts || defaultPrepayDiscounts;
-
+  
   return packages.map(hours => {
     const discountPercent = (discounts as Record<string, number>)[hours.toString()] || 0;
     const adjustedHourlyRate = hourlyRate * (1 - discountPercent / 100);
     const totalCost = hours * adjustedHourlyRate;
     const savings = (hours * hourlyRate) * (discountPercent / 100);
-
+    
     return {
       hours,
       adjustedHourlyRate,
@@ -109,18 +95,18 @@ export function calculatePrepayOptions(
   });
 }
 
-function calculatePaymentPlanOptions(
+export function calculateFinancingOptions(
   totalHours: number,
   hourlyRate: number,
   packages: number[],
   customDiscounts?: Record<string, number>
-): {
+): { 
   twelveMonth: FinancingOption[];
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
 } {
   const baseDiscounts = customDiscounts || defaultInterestDiscounts;
-
+  
   const calculateForTerm = (months: number, discountAdjustment: number = 0) => {
     return packages.map(hours => {
       const discountPercent = Math.max(0, ((baseDiscounts as Record<string, number>)[hours.toString()] || 0) + discountAdjustment);
@@ -128,7 +114,7 @@ function calculatePaymentPlanOptions(
       const totalCost = hours * adjustedHourlyRate;
       const monthlyCost = totalCost / months;
       const savings = (hours * hourlyRate) * (discountPercent / 100);
-
+      
       return {
         hours,
         adjustedHourlyRate,
@@ -139,23 +125,10 @@ function calculatePaymentPlanOptions(
       };
     });
   };
-
+  
   return {
     twelveMonth: calculateForTerm(12, 0),
     eighteenMonth: calculateForTerm(18, -5),
-    twentyFourMonth: calculateForTerm(24, -10)
+    twentyFourMonth: calculateForTerm(24, -5)
   };
-}
-
-export function calculateFinancingOptions(
-  totalHours: number,
-  hourlyRate: number,
-  packages: number[],
-  customDiscounts?: Record<string, number>
-): {
-  twelveMonth: FinancingOption[];
-  eighteenMonth: FinancingOption[];
-  twentyFourMonth: FinancingOption[];
-} {
-  return calculatePaymentPlanOptions(totalHours, hourlyRate, packages, customDiscounts);
 }

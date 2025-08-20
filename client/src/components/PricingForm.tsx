@@ -204,7 +204,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="2-8">2-8 hours per week</SelectItem>
-                      <SelectItem value="4-12">4-12 hours per week</SelectItem>
+                      <SelectItem value="4-16">4-16 hours per week</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
