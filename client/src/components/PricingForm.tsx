@@ -53,11 +53,11 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
   const watchedValues = form.watch();
 
   useEffect(() => {
-    const isValid = form.formState.isValid && 
-      watchedValues.hourlyRate > 0 && 
-      !!watchedValues.weeklyHours && 
+    const isValid = form.formState.isValid &&
+      watchedValues.hourlyRate > 0 &&
+      !!watchedValues.weeklyHours &&
       (watchedValues.version === "payment-plan" || !!watchedValues.packageRange);
-    
+
     onValidityChange(isValid);
 
     if (isValid) {
@@ -85,16 +85,16 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
     if (watchedValues.version === "tiered" && watchedValues.packageRange && watchedValues.packageRange !== selectedPackageRange) {
       setSelectedPackageRange(watchedValues.packageRange);
       const packages = watchedValues.packageRange.split(',');
-      
+
       // Set default discount values for tiered version
       const newPrepayDiscounts: Record<string, number> = {};
       const newInterestDiscounts: Record<string, number> = {};
-      
+
       packages.forEach(pkg => {
         newPrepayDiscounts[pkg] = defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts] || 0;
         newInterestDiscounts[pkg] = defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts] || 0;
       });
-      
+
       form.setValue('prepayDiscounts', newPrepayDiscounts);
       form.setValue('interestDiscounts', newInterestDiscounts);
     } else if (watchedValues.version === "payment-plan") {
@@ -204,7 +204,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="2-8">2-8 hours per week</SelectItem>
-                      <SelectItem value="4-16">4-16 hours per week</SelectItem>
+                      <SelectItem value="4-12">4-12 hours per week</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
