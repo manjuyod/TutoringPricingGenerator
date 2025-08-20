@@ -109,7 +109,7 @@ export function calculatePrepayOptions(
   });
 }
 
-export function calculateFinancingOptions(
+function calculatePaymentPlanOptions(
   totalHours: number,
   hourlyRate: number,
   packages: number[],
@@ -143,6 +143,19 @@ export function calculateFinancingOptions(
   return {
     twelveMonth: calculateForTerm(12, 0),
     eighteenMonth: calculateForTerm(18, -5),
-    twentyFourMonth: calculateForTerm(24, -5)
+    twentyFourMonth: calculateForTerm(24, -10)
   };
+}
+
+export function calculateFinancingOptions(
+  totalHours: number,
+  hourlyRate: number,
+  packages: number[],
+  customDiscounts?: Record<string, number>
+): {
+  twelveMonth: FinancingOption[];
+  eighteenMonth: FinancingOption[];
+  twentyFourMonth: FinancingOption[];
+} {
+  return calculatePaymentPlanOptions(totalHours, hourlyRate, packages, customDiscounts);
 }
