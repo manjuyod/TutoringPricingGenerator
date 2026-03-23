@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
+import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 
 interface PdfFormData {
@@ -55,8 +55,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
     await generatePaymentPlanPage2(pdf, monthlyOptions, totalHours, hourlyRate, prepayDiscounts, interestDiscounts);
   } else {
     const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
-    const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
-    await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions, totalHours);
+    await generatePage2(pdf, monthlyOptions, prepayOptions, totalHours);
   }
 
   // Save the PDF
@@ -135,11 +134,7 @@ async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: nu
   await renderHtmlToPdf(pdf, htmlContent, timeline);
 }
 
-async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[], prepayOptions: any[], financingOptions: {
-  twelveMonth: FinancingOption[];
-  eighteenMonth: FinancingOption[];
-  twentyFourMonth: FinancingOption[];
-}, totalHours: number) {
+async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[], prepayOptions: any[], totalHours: number) {
   // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
@@ -227,69 +222,6 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 8;
-
-  // Section 3: 0% Interest Tuition Option (Yellow theme only)
-  pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 2, 180, 20, 'F');
-
-  pdf.setFontSize(13);
-  pdf.setTextColor(249, 197, 70); // Brand yellow
-  pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
-  yPosition += 8;
-
-  pdf.setFontSize(7);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
-  yPosition += 5;
-
-  // 12 Month Plan
-  pdf.setFontSize(9);
-  pdf.setTextColor(249, 197, 70); // Brand yellow
-  pdf.text('12 Month Plan', 20, yPosition);
-  yPosition += 4;
-
-  autoTable(pdf, {
-    startY: yPosition,
-    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
-    body: financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
-      hours.toString(),
-      `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${Math.round(totalCost)}`,
-      `${discountPercent}%`,
-      `$${Math.round(monthlyCost)}`,
-      `$${Math.round(savings)}`
-    ]),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header
-    margin: { left: 20, right: 20 }
-  });
-
-  yPosition = (pdf as any).lastAutoTable.finalY + 6;
-
-  // 18 Month Plan
-  pdf.setFontSize(9);
-  pdf.setTextColor(249, 197, 70); // Brand yellow
-  pdf.text('18 Month Plan', 20, yPosition);
-  yPosition += 4;
-
-  autoTable(pdf, {
-    startY: yPosition,
-    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
-    body: financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
-      hours.toString(),
-      `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${Math.round(totalCost)}`,
-      `${discountPercent}%`,
-      `$${Math.round(monthlyCost)}`,
-      `$${Math.round(savings)}`
-    ]),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header with black text for readability
-    margin: { left: 20, right: 20 }
-  });
 }
 
 async function generatePaymentPlanPage2(
@@ -404,11 +336,8 @@ async function generatePaymentPlanPage2(
 
   // Calculate monthly payments for different terms
   const paymentTerms = [
-    { months: 12, interest: '0%', monthly: discountedTotal / 12 },
-    { months: 18, interest: '0%', monthly: discountedTotal / 18 },
-    { months: 24, interest: '0%', monthly: discountedTotal / 24 },
-    { months: 36, interest: '5.99 - 19.99%', monthlyLow: (discountedTotal * 1.0599) / 36, monthlyHigh: (discountedTotal * 1.1999) / 36 }, // 5.99% to 19.99% interest
-    { months: 48, interest: '6.99 - 19.99%', monthlyLow: (discountedTotal * 1.0699) / 48, monthlyHigh: (discountedTotal * 1.1999) / 48 }, // 6.99% to 19.99% interest
+    { months: 36, interest: '5.99 - 19.99%', monthlyLow: (discountedTotal * 1.0599) / 36, monthlyHigh: (discountedTotal * 1.1999) / 36 },
+    { months: 48, interest: '6.99 - 19.99%', monthlyLow: (discountedTotal * 1.0699) / 48, monthlyHigh: (discountedTotal * 1.1999) / 48 },
   ];
 
   autoTable(pdf, {
