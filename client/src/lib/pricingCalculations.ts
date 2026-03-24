@@ -1,4 +1,4 @@
-import { defaultPrepayDiscounts, defaultInterestDiscounts } from "@shared/schema";
+import { defaultPrepayDiscounts, defaultInterestDiscounts, defaultEighteenMonthDiscounts, defaultTwentyFourMonthDiscounts } from "@shared/schema";
 
 export interface SubjectHours {
   "Beginning Reading/Phonics": number;
@@ -43,7 +43,7 @@ export function calculateTotalHours(subjects: SubjectHours): number {
 
 export function getSelectedSubjects(subjects: SubjectHours): Array<{ name: string; hours: number }> {
   return Object.entries(subjects)
-    .filter(([_, hours]) => hours > 0)
+    .filter(([, hours]) => hours > 0)
     .map(([name, hours]) => ({ name, hours }));
 }
 
@@ -99,17 +99,21 @@ export function calculateFinancingOptions(
   totalHours: number,
   hourlyRate: number,
   packages: number[],
-  customDiscounts?: Record<string, number>
-): { 
+  customDiscounts?: Record<string, number>,
+  customEighteenMonthDiscounts?: Record<string, number>,
+  customTwentyFourMonthDiscounts?: Record<string, number>
+): {
   twelveMonth: FinancingOption[];
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
 } {
-  const baseDiscounts = customDiscounts || defaultInterestDiscounts;
+  const twelveDiscounts = customDiscounts || defaultInterestDiscounts;
+  const eighteenDiscounts = customEighteenMonthDiscounts || defaultEighteenMonthDiscounts;
+  const twentyFourDiscounts = customTwentyFourMonthDiscounts || defaultTwentyFourMonthDiscounts;
 
-  const calculateForTerm = (months: number, discountAdjustment: number = 0) => {
+  const calculateForDiscounts = (months: number, discountMap: Record<string, number>) => {
     return packages.map(hours => {
-      const discountPercent = Math.max(0, ((baseDiscounts as Record<string, number>)[hours.toString()] || 0) + discountAdjustment);
+      const discountPercent = Math.max(0, (discountMap as Record<string, number>)[hours.toString()] || 0);
       const adjustedHourlyRate = hourlyRate * (1 - discountPercent / 100);
       const totalCost = hours * adjustedHourlyRate;
       const monthlyCost = totalCost / months;
@@ -127,8 +131,8 @@ export function calculateFinancingOptions(
   };
 
   return {
-    twelveMonth: calculateForTerm(12, 0),
-    eighteenMonth: calculateForTerm(18, -5),
-    twentyFourMonth: calculateForTerm(24, -10)
+    twelveMonth: calculateForDiscounts(12, twelveDiscounts),
+    eighteenMonth: calculateForDiscounts(18, eighteenDiscounts),
+    twentyFourMonth: calculateForDiscounts(24, twentyFourDiscounts)
   };
 }

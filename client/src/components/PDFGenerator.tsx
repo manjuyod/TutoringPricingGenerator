@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { generateAdvancedPricingPDF } from "@/lib/htmlToPdfGenerator";
-import { FileText, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { SubjectHours } from "@/lib/pricingCalculations";
 import { useState } from "react";
 
@@ -13,6 +13,8 @@ interface PDFGeneratorProps {
     packages: number[];
     prepayDiscounts: Record<string, number>;
     interestDiscounts: Record<string, number>;
+    eighteenMonthDiscounts: Record<string, number>;
+    twentyFourMonthDiscounts: Record<string, number>;
   };
   isValid: boolean;
 }

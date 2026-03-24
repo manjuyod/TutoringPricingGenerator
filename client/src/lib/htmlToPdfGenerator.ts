@@ -12,6 +12,8 @@ interface PdfFormData {
   packages: number[];
   prepayDiscounts: Record<string, number>;
   interestDiscounts: Record<string, number>;
+  eighteenMonthDiscounts?: Record<string, number>;
+  twentyFourMonthDiscounts?: Record<string, number>;
 }
 
 // Define the MonthlyPaymentOption interface for clarity in generatePaymentPlanPage2
@@ -23,7 +25,7 @@ interface MonthlyPaymentOption {
 
 export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise<void> {
   try {
-    const { version, hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts } = formData;
+    const { version, hourlyRate, weeklyHours, subjects, packages, prepayDiscounts, interestDiscounts, eighteenMonthDiscounts, twentyFourMonthDiscounts } = formData;
 
     // Validate input data
     if (!version || !hourlyRate || !weeklyHours || !subjects) {
@@ -55,7 +57,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
     await generatePaymentPlanPage2(pdf, monthlyOptions, totalHours, hourlyRate, prepayDiscounts, interestDiscounts);
   } else {
     const prepayOptions = calculatePrepayOptions(totalHours, hourlyRate, packages, prepayDiscounts);
-    const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts);
+    const financingOptions = calculateFinancingOptions(totalHours, hourlyRate, packages, interestDiscounts, eighteenMonthDiscounts, twentyFourMonthDiscounts);
     await generatePage2(pdf, monthlyOptions, prepayOptions, financingOptions, totalHours);
   }
 
@@ -141,31 +143,31 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   twentyFourMonth: FinancingOption[];
 }, totalHours: number) {
   // Add title with brand styling and Total Recommended Hours box inline
-  pdf.setFontSize(30);
+  pdf.setFontSize(26);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 99, 168); // Navy color
-  pdf.text('Tuition Payment Options', 20, 20);
+  pdf.text('Tuition Payment Options', 20, 17);
 
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 157, 5, 38, 18, 3);
 
-  pdf.setFontSize(7);
+  pdf.setFontSize(6.5);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
+  pdf.text('Our Recommendation:', 176, 11, { align: 'center' });
 
   // Use totalHours from Academic Game Plan page
-  pdf.setFontSize(14);
+  pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49);
-  pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
+  pdf.text(`${totalHours} hours`, 176, 19, { align: 'center' });
 
   // Add subtitle
-  pdf.setFontSize(10);
+  pdf.setFontSize(9.5);
   pdf.setTextColor(242, 106, 49); // Orange color
-  pdf.text('Flexible payment solutions designed for your budget', 20, 28);
+  pdf.text('Flexible payment solutions designed for your budget', 20, 24);
 
-  let yPosition = 40;
+  let yPosition = 33;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
@@ -195,7 +197,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 8;
+  yPosition = (pdf as any).lastAutoTable.finalY + 5;
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
@@ -227,85 +229,41 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 8;
+  yPosition = (pdf as any).lastAutoTable.finalY + 5;
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 2, 180, 20, 'F');
+  pdf.rect(15, yPosition - 2, 180, 16, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
   pdf.text('0% Interest Tuition Option', 20, yPosition + 3);
-  yPosition += 8;
+  yPosition += 7;
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
-  yPosition += 5;
+  yPosition += 3;
 
-  // 12 Month Plan
-  pdf.setFontSize(9);
-  pdf.setTextColor(249, 197, 70); // Brand yellow
-  pdf.text('12 Month Plan', 20, yPosition);
-  yPosition += 4;
+  const financingHeaders = [['Hours', 'Adj. Rate', 'Total', 'Disc', 'Monthly', 'Save']];
+  const financingTableStyles = { fontSize: 8, cellPadding: 2, halign: 'center' as const };
+  const financingHeadStyles = {
+    fillColor: [249, 197, 70] as [number, number, number],
+    textColor: [0, 0, 0] as [number, number, number],
+    halign: 'center' as const
+  };
+  const financingMargin = { left: 20, right: 20 };
 
-  autoTable(pdf, {
-    startY: yPosition,
-    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
-    body: financingOptions.twelveMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
-      hours.toString(),
-      `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${Math.round(totalCost)}`,
-      `${discountPercent}%`,
-      `$${Math.round(monthlyCost)}`,
-      `$${Math.round(savings)}`
-    ]),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header
-    margin: { left: 20, right: 20 }
-  });
+  const renderFinancingPlanTable = (label: string, options: FinancingOption[]) => {
+    pdf.setFontSize(9);
+    pdf.setTextColor(249, 197, 70);
+    pdf.text(label, 20, yPosition);
+    yPosition += 3;
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 6;
-
-  // 18 Month Plan
-  pdf.setFontSize(9);
-  pdf.setTextColor(249, 197, 70); // Brand yellow
-  pdf.text('18 Month Plan', 20, yPosition);
-  yPosition += 4;
-
-  autoTable(pdf, {
-    startY: yPosition,
-    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
-    body: financingOptions.eighteenMonth.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
-      hours.toString(),
-      `$${adjustedHourlyRate.toFixed(2)}`,
-      `$${Math.round(totalCost)}`,
-      `${discountPercent}%`,
-      `$${Math.round(monthlyCost)}`,
-      `$${Math.round(savings)}`
-    ]),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
-    margin: { left: 20, right: 20 }
-  });
-
-  pdf.addPage();
-  yPosition = 20;
-
-  // 24 Month Plan
-  pdf.setFontSize(9);
-  pdf.setTextColor(249, 197, 70);
-  pdf.text('24 Month Plan', 20, yPosition);
-  yPosition += 4;
-
-  autoTable(pdf, {
-    startY: yPosition,
-    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
-    body: financingOptions.twentyFourMonth
-      .filter(({ hours }) => [128, 192].includes(hours))
-      .map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
+    autoTable(pdf, {
+      startY: yPosition,
+      head: financingHeaders,
+      body: options.map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
         hours.toString(),
         `$${adjustedHourlyRate.toFixed(2)}`,
         `$${Math.round(totalCost)}`,
@@ -313,11 +271,21 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
         `$${Math.round(monthlyCost)}`,
         `$${Math.round(savings)}`
       ]),
-    theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
-    margin: { left: 20, right: 20 }
-  });
+      theme: 'grid',
+      styles: financingTableStyles,
+      headStyles: financingHeadStyles,
+      margin: financingMargin
+    });
+
+    yPosition = (pdf as any).lastAutoTable.finalY + 3;
+  };
+
+  renderFinancingPlanTable('12 Month Plan', financingOptions.twelveMonth);
+  renderFinancingPlanTable('18 Month Plan', financingOptions.eighteenMonth);
+  renderFinancingPlanTable(
+    '24 Month Plan',
+    financingOptions.twentyFourMonth.filter(({ hours }) => [128, 160, 192].includes(hours))
+  );
 }
 
 async function generatePaymentPlanPage2(
@@ -329,30 +297,30 @@ async function generatePaymentPlanPage2(
   interestDiscounts: Record<string, number> = {}
 ): Promise<void> {
   // Add title with brand styling and Total Recommended Hours box inline
-  pdf.setFontSize(30);
+  pdf.setFontSize(26);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 99, 168); // Navy color
-  pdf.text('Tuition Payment Options', 20, 20);
+  pdf.text('Tuition Payment Options', 20, 17);
 
   // Total Recommended Hours box - positioned inline with title
   pdf.setLineWidth(0.5); // Thinner border like first page
   pdf.setDrawColor(0, 99, 168);
-  drawRoundedRect(pdf, 155, 8, 40, 20, 3); // Rounded rectangle, no fill, narrower width
+  drawRoundedRect(pdf, 157, 5, 38, 18, 3);
 
-  pdf.setFontSize(7);
+  pdf.setFontSize(6.5);
   pdf.setTextColor(0, 99, 168);
-  pdf.text('Our Recommendation:', 175, 14, { align: 'center' });
+  pdf.text('Our Recommendation:', 176, 11, { align: 'center' });
 
-  pdf.setFontSize(14);
+  pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49);
-  pdf.text(`${totalHours} hours`, 175, 23, { align: 'center' });
+  pdf.text(`${totalHours} hours`, 176, 19, { align: 'center' });
 
   // Add subtitle
-  pdf.setFontSize(10);
+  pdf.setFontSize(9.5);
   pdf.setTextColor(242, 106, 49); // Orange color
-  pdf.text('Simplified payment solutions for your convenience', 20, 28);
+  pdf.text('Simplified payment solutions for your convenience', 20, 24);
 
-  let yPosition = 40;
+  let yPosition = 33;
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
@@ -542,7 +510,7 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
   }
 }
 
-function drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
+function _drawLineChart(canvas: HTMLCanvasElement, timeline: any[]): void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -759,30 +727,5 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
 
 // Helper function to draw rounded rectangle
 function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
-  const k = pdf.internal.scaleFactor;
-  const x1 = x;
-  const y1 = y;
-  const x2 = x + width;
-  const y2 = y + height;
-
-  pdf.internal.write([
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y1) * k, 'm',
-    (x2 - radius) * k, (pdf.internal.pageSize.height - y1) * k, 'l',
-    (x2 - radius + radius * 0.552) * k, (pdf.internal.pageSize.height - y1) * k,
-    x2 * k, (pdf.internal.pageSize.height - (y1 + radius - radius * 0.552)) * k,
-    x2 * k, (pdf.internal.pageSize.height - (y1 + radius)) * k, 'c',
-    x2 * k, (pdf.internal.pageSize.height - (y2 - radius)) * k, 'l',
-    x2 * k, (pdf.internal.pageSize.height - (y2 - radius + radius * 0.552)) * k,
-    (x2 - radius + radius * 0.552) * k, (pdf.internal.pageSize.height - y2) * k,
-    (x2 - radius) * k, (pdf.internal.pageSize.height - y2) * k, 'c',
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y2) * k, 'l',
-    (x1 + radius - radius * 0.552) * k, (pdf.internal.pageSize.height - y2) * k,
-    x1 * k, (pdf.internal.pageSize.height - (y2 - radius + radius * 0.552)) * k,
-    x1 * k, (pdf.internal.pageSize.height - (y2 - radius)) * k, 'c',
-    x1 * k, (pdf.internal.pageSize.height - (y1 + radius)) * k, 'l',
-    x1 * k, (pdf.internal.pageSize.height - (y1 + radius - radius * 0.552)) * k,
-    (x1 + radius - radius * 0.552) * k, (pdf.internal.pageSize.height - y1) * k,
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y1) * k, 'c',
-    'S'
-  ].join(' '));
+  pdf.roundedRect(x, y, width, height, radius, radius, "S");
 }

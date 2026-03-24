@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,14 +16,18 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+const pricingVersions = ["tiered", "payment-plan"] as const;
+const weeklyHourRanges = ["2-8", "4-16"] as const;
+const packageRanges = ["64,96,128,192", "96,128,160,192", "96,128,192,256", "128,256,320,400"] as const;
+
 // Pricing form schema
 export const pricingFormSchema = z.object({
-  version: z.enum(["tiered", "payment-plan"], {
-    required_error: "Please select a pricing sheet version",
+  version: z.enum(pricingVersions, {
+    error: "Please select a pricing sheet version",
   }),
   hourlyRate: z.number().min(0.01, "Hourly rate must be greater than 0"),
-  weeklyHours: z.enum(["2-8", "4-16"], {
-    required_error: "Please select a weekly hours range",
+  weeklyHours: z.enum(weeklyHourRanges, {
+    error: "Please select a weekly hours range",
   }),
   beginningReading: z.number().min(0).max(400),
   reading: z.number().min(0).max(400),
@@ -31,11 +35,13 @@ export const pricingFormSchema = z.object({
   math: z.number().min(0).max(400),
   tutorUp: z.number().min(0).max(400),
   testPrep: z.number().min(0).max(400),
-  packageRange: z.enum(["64,96,128,192", "96,128,160,192", "96,128,192,256", "128,256,320,400"], {
-    required_error: "Please select a package range",
+  packageRange: z.enum(packageRanges, {
+    error: "Please select a package range",
   }).optional(),
   prepayDiscounts: z.record(z.string(), z.number().min(0).max(100)),
   interestDiscounts: z.record(z.string(), z.number().min(0).max(100)),
+  eighteenMonthDiscounts: z.record(z.string(), z.number().min(0).max(100)),
+  twentyFourMonthDiscounts: z.record(z.string(), z.number().min(0).max(100)),
 });
 
 export type PricingFormData = z.infer<typeof pricingFormSchema>;
@@ -61,4 +67,26 @@ export const defaultInterestDiscounts = {
   "256": 30,
   "320": 35,
   "400": 35,
+};
+
+export const defaultEighteenMonthDiscounts = {
+  "64": 0,
+  "96": 5,
+  "128": 10,
+  "160": 15,
+  "192": 20,
+  "256": 25,
+  "320": 30,
+  "400": 30,
+};
+
+export const defaultTwentyFourMonthDiscounts = {
+  "64": 0,
+  "96": 0,
+  "128": 5,
+  "160": 10,
+  "192": 15,
+  "256": 20,
+  "320": 25,
+  "400": 25,
 };

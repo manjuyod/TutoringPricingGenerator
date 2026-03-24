@@ -15,6 +15,8 @@ export default function PricingGenerator() {
     packages: number[];
     prepayDiscounts: Record<string, number>;
     interestDiscounts: Record<string, number>;
+    eighteenMonthDiscounts: Record<string, number>;
+    twentyFourMonthDiscounts: Record<string, number>;
   } | null>(null);
   
   const [isFormValid, setIsFormValid] = useState(false);

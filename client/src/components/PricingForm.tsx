@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Info, Book, Package, Percent, FileText } from "lucide-react";
-import { pricingFormSchema, defaultPrepayDiscounts, defaultInterestDiscounts, type PricingFormData } from "@shared/schema";
-import { useEffect, useState } from "react";
+import { pricingFormSchema, defaultPrepayDiscounts, defaultInterestDiscounts, defaultEighteenMonthDiscounts, defaultTwentyFourMonthDiscounts, type PricingFormData } from "@shared/schema";
+import { useEffect, useRef } from "react";
 
 interface PricingFormProps {
   onFormDataChange: (data: {
@@ -25,95 +25,155 @@ interface PricingFormProps {
     packages: number[];
     prepayDiscounts: Record<string, number>;
     interestDiscounts: Record<string, number>;
+    eighteenMonthDiscounts: Record<string, number>;
+    twentyFourMonthDiscounts: Record<string, number>;
   }) => void;
   onValidityChange: (isValid: boolean) => void;
 }
 
+const subjectFields: Array<{
+  name: "beginningReading" | "reading" | "writing" | "math" | "tutorUp" | "testPrep";
+  label: string;
+}> = [
+  { name: "beginningReading", label: "Beginning Reading/Phonics (hours)" },
+  { name: "reading", label: "Reading (hours)" },
+  { name: "writing", label: "Writing (hours)" },
+  { name: "math", label: "Math (hours)" },
+  { name: "tutorUp", label: "TutorUp (hours)" },
+  { name: "testPrep", label: "Test Prep (hours)" },
+];
+
+const hourOptions = Array.from({ length: 25 }, (_, index) => (index + 1) * 16);
+const emptyDiscountMap: Record<string, number> = {};
+
 export default function PricingForm({ onFormDataChange, onValidityChange }: PricingFormProps) {
-  const [selectedPackageRange, setSelectedPackageRange] = useState<string>("");
+  const initializedTieredRangeRef = useRef<PricingFormData["packageRange"]>();
 
   const form = useForm<PricingFormData>({
     resolver: zodResolver(pricingFormSchema),
     defaultValues: {
       version: "tiered",
       hourlyRate: 0,
-      weeklyHours: "",
+      weeklyHours: undefined,
       beginningReading: 0,
       reading: 0,
       writing: 0,
       math: 0,
       tutorUp: 0,
       testPrep: 0,
-      packageRange: "",
+      packageRange: undefined,
       prepayDiscounts: {},
       interestDiscounts: {},
+      eighteenMonthDiscounts: {},
+      twentyFourMonthDiscounts: {},
     },
   });
 
-  const watchedValues = form.watch();
+  const version = useWatch({ control: form.control, name: "version" });
+  const hourlyRate = useWatch({ control: form.control, name: "hourlyRate" });
+  const weeklyHours = useWatch({ control: form.control, name: "weeklyHours" });
+  const beginningReading = useWatch({ control: form.control, name: "beginningReading" });
+  const reading = useWatch({ control: form.control, name: "reading" });
+  const writing = useWatch({ control: form.control, name: "writing" });
+  const math = useWatch({ control: form.control, name: "math" });
+  const tutorUp = useWatch({ control: form.control, name: "tutorUp" });
+  const testPrep = useWatch({ control: form.control, name: "testPrep" });
+  const packageRange = useWatch({ control: form.control, name: "packageRange" });
+  const prepayDiscounts = useWatch({ control: form.control, name: "prepayDiscounts" }) ?? emptyDiscountMap;
+  const interestDiscounts = useWatch({ control: form.control, name: "interestDiscounts" }) ?? emptyDiscountMap;
+  const eighteenMonthDiscounts = useWatch({ control: form.control, name: "eighteenMonthDiscounts" }) ?? emptyDiscountMap;
+  const twentyFourMonthDiscounts = useWatch({ control: form.control, name: "twentyFourMonthDiscounts" }) ?? emptyDiscountMap;
+  const packages = packageRange ? packageRange.split(",") : [];
 
   useEffect(() => {
-    const hasValidBasicInfo = watchedValues.hourlyRate > 0 && !!watchedValues.weeklyHours;
-    const hasValidPackages = watchedValues.version === "payment-plan" || !!watchedValues.packageRange;
+    const hasValidBasicInfo = hourlyRate > 0 && !!weeklyHours;
+    const hasValidPackages = version === "payment-plan" || !!packageRange;
     const isValid = hasValidBasicInfo && hasValidPackages;
 
     onValidityChange(isValid);
 
-    if (isValid) {
-      const packages = watchedValues.packageRange ? watchedValues.packageRange.split(',').map(Number) : [];
+    if (isValid && version && weeklyHours) {
+      const selectedPackages = packageRange ? packageRange.split(",").map(Number) : [];
+
       onFormDataChange({
-        version: watchedValues.version!,
-        hourlyRate: watchedValues.hourlyRate,
-        weeklyHours: watchedValues.weeklyHours!,
+        version,
+        hourlyRate,
+        weeklyHours,
         subjects: {
-          "Beginning Reading/Phonics": watchedValues.beginningReading || 0,
-          "Reading": watchedValues.reading || 0,
-          "Writing": watchedValues.writing || 0,
-          "Math": watchedValues.math || 0,
-          "TutorUp": watchedValues.tutorUp || 0,
-          "Test Prep": watchedValues.testPrep || 0,
+          "Beginning Reading/Phonics": beginningReading || 0,
+          "Reading": reading || 0,
+          "Writing": writing || 0,
+          "Math": math || 0,
+          "TutorUp": tutorUp || 0,
+          "Test Prep": testPrep || 0,
         },
-        packages,
-        prepayDiscounts: watchedValues.prepayDiscounts || {},
-        interestDiscounts: watchedValues.interestDiscounts || {},
+        packages: selectedPackages,
+        prepayDiscounts,
+        interestDiscounts,
+        eighteenMonthDiscounts,
+        twentyFourMonthDiscounts,
       });
     }
-  }, [watchedValues, onFormDataChange, onValidityChange]);
+  }, [
+    beginningReading,
+    hourlyRate,
+    interestDiscounts,
+    eighteenMonthDiscounts,
+    twentyFourMonthDiscounts,
+    math,
+    onFormDataChange,
+    onValidityChange,
+    packageRange,
+    prepayDiscounts,
+    reading,
+    testPrep,
+    tutorUp,
+    version,
+    weeklyHours,
+    writing,
+  ]);
 
   useEffect(() => {
-    if (watchedValues.version === "tiered" && watchedValues.packageRange && watchedValues.packageRange !== selectedPackageRange) {
-      setSelectedPackageRange(watchedValues.packageRange);
-      const packages = watchedValues.packageRange.split(',');
+    if (version === "tiered" && packageRange) {
+      if (initializedTieredRangeRef.current === packageRange) {
+        return;
+      }
+
+      initializedTieredRangeRef.current = packageRange;
+      const selectedPackages = packageRange.split(",");
 
       // Set default discount values for tiered version
       const newPrepayDiscounts: Record<string, number> = {};
       const newInterestDiscounts: Record<string, number> = {};
+      const newEighteenMonthDiscounts: Record<string, number> = {};
+      const newTwentyFourMonthDiscounts: Record<string, number> = {};
 
-      packages.forEach(pkg => {
+      selectedPackages.forEach(pkg => {
         newPrepayDiscounts[pkg] = defaultPrepayDiscounts[pkg as keyof typeof defaultPrepayDiscounts] || 0;
         newInterestDiscounts[pkg] = defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts] || 0;
+        newEighteenMonthDiscounts[pkg] = defaultEighteenMonthDiscounts[pkg as keyof typeof defaultEighteenMonthDiscounts] || 0;
+        newTwentyFourMonthDiscounts[pkg] = defaultTwentyFourMonthDiscounts[pkg as keyof typeof defaultTwentyFourMonthDiscounts] || 0;
       });
 
       form.setValue('prepayDiscounts', newPrepayDiscounts);
       form.setValue('interestDiscounts', newInterestDiscounts);
-    } else if (watchedValues.version === "payment-plan") {
+      form.setValue('eighteenMonthDiscounts', newEighteenMonthDiscounts);
+      form.setValue('twentyFourMonthDiscounts', newTwentyFourMonthDiscounts);
+      return;
+    }
+
+    initializedTieredRangeRef.current = undefined;
+
+    if (version === "payment-plan") {
       // Set default discount values for payment plan version only if not already set
-      if (!watchedValues.prepayDiscounts?.general) {
+      if (prepayDiscounts.general == null) {
         form.setValue('prepayDiscounts', { general: 20 });
       }
-      if (!watchedValues.interestDiscounts?.general) {
+      if (interestDiscounts.general == null) {
         form.setValue('interestDiscounts', { general: 5 });
       }
     }
-  }, [watchedValues.packageRange, watchedValues.version, selectedPackageRange, watchedValues.prepayDiscounts, watchedValues.interestDiscounts, form]);
-
-  // Generate hour options (16-400 in increments of 16)
-  const hourOptions: number[] = [];
-  for (let i = 16; i <= 400; i += 16) {
-    hourOptions.push(i);
-  }
-
-  const packages = selectedPackageRange ? selectedPackageRange.split(',') : [];
+  }, [form, interestDiscounts, packageRange, prepayDiscounts, version]);
 
   return (
     <div className="space-y-6">
@@ -127,7 +187,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <FormField
+            <FormField<PricingFormData, "version">
               control={form.control}
               name="version"
               render={({ field }) => (
@@ -136,7 +196,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       className="space-y-2"
                     >
                       <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
@@ -171,7 +231,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
+            <FormField<PricingFormData, "hourlyRate">
               control={form.control}
               name="hourlyRate"
               render={({ field }) => (
@@ -193,13 +253,13 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                 </FormItem>
               )}
             />
-            <FormField
+            <FormField<PricingFormData, "weeklyHours">
               control={form.control}
               name="weeklyHours"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Recommended Hours Per Week</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="focus:ring-2 focus:ring-tc-blue focus:border-transparent">
                         <SelectValue placeholder="Select Range" />
@@ -207,7 +267,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="2-8">2-8 hours per week</SelectItem>
-                      <SelectItem value="4-12">4-12 hours per week</SelectItem>
+                      <SelectItem value="4-16">4-16 hours per week</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -226,22 +286,15 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: 'beginningReading', label: 'Beginning Reading/Phonics (hours)' },
-              { name: 'reading', label: 'Reading (hours)' },
-              { name: 'writing', label: 'Writing (hours)' },
-              { name: 'math', label: 'Math (hours)' },
-              { name: 'tutorUp', label: 'TutorUp (hours)' },
-              { name: 'testPrep', label: 'Test Prep (hours)' },
-            ].map(({ name, label }) => (
-              <FormField
+            {subjectFields.map(({ name, label }) => (
+              <FormField<PricingFormData, typeof name>
                 key={name}
                 control={form.control}
-                name={name as keyof PricingFormData}
+                name={name}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{label}</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value, 10))} value={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger className="focus:ring-2 focus:ring-tc-blue focus:border-transparent">
                           <SelectValue placeholder="No sessions" />
@@ -265,7 +318,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
         </Card>
 
         {/* Package Selection - Only show for tiered version */}
-        {watchedValues.version === "tiered" && (
+        {version === "tiered" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
@@ -274,7 +327,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FormField
+              <FormField<PricingFormData, "packageRange">
                 control={form.control}
                 name="packageRange"
                 render={({ field }) => (
@@ -283,7 +336,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                         className="space-y-2"
                       >
                         {[
@@ -310,7 +363,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
         )}
 
         {/* Discount Configuration - Show for both versions */}
-        {(watchedValues.version === "tiered" || watchedValues.version === "payment-plan") && (
+        {(version === "tiered" || version === "payment-plan") && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
@@ -319,21 +372,21 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {watchedValues.version === "tiered" ? (
+              {version === "tiered" ? (
                 packages.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     {/* Prepay Discounts */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
+                      <h4 className="mb-3 whitespace-nowrap text-sm font-medium text-gray-900">Prepay Discounts (%)</h4>
                       <div className="space-y-3">
                         {packages.map(pkg => (
-                          <FormField
+                          <FormField<PricingFormData, `prepayDiscounts.${string}`>
                             key={`prepay-${pkg}`}
                             control={form.control}
-                            name={`prepayDiscounts.${pkg}` as any}
+                            name={`prepayDiscounts.${pkg}` as const}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
+                                <FormLabel>{pkg} hrs</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
@@ -354,22 +407,86 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                       </div>
                     </div>
 
-                    {/* Interest Discounts */}
+                    {/* 12-Month Interest Discounts */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
+                      <h4 className="mb-3 whitespace-nowrap text-sm font-medium text-gray-900">12 Month Discounts (%)</h4>
                       <div className="space-y-3">
                         {packages.map(pkg => (
-                          <FormField
+                          <FormField<PricingFormData, `interestDiscounts.${string}`>
                             key={`interest-${pkg}`}
                             control={form.control}
-                            name={`interestDiscounts.${pkg}` as any}
+                            name={`interestDiscounts.${pkg}` as const}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
+                                <FormLabel>{pkg} hrs</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
                                     placeholder={defaultInterestDiscounts[pkg as keyof typeof defaultInterestDiscounts]?.toString() || "0"}
+                                    step="1"
+                                    min="0"
+                                    max="100"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 18-Month Discounts */}
+                    <div>
+                      <h4 className="mb-3 whitespace-nowrap text-sm font-medium text-gray-900">18 Month Discounts (%)</h4>
+                      <div className="space-y-3">
+                        {packages.map(pkg => (
+                          <FormField<PricingFormData, `eighteenMonthDiscounts.${string}`>
+                            key={`eighteen-${pkg}`}
+                            control={form.control}
+                            name={`eighteenMonthDiscounts.${pkg}` as const}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{pkg} hrs</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder={defaultEighteenMonthDiscounts[pkg as keyof typeof defaultEighteenMonthDiscounts]?.toString() || "0"}
+                                    step="1"
+                                    min="0"
+                                    max="100"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    className="focus:ring-2 focus:ring-tc-blue focus:border-transparent"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 24-Month Discounts */}
+                    <div>
+                      <h4 className="mb-3 whitespace-nowrap text-sm font-medium text-gray-900">24 Month Discounts (%)</h4>
+                      <div className="space-y-3">
+                        {packages.map(pkg => (
+                          <FormField<PricingFormData, `twentyFourMonthDiscounts.${string}`>
+                            key={`twentyfour-${pkg}`}
+                            control={form.control}
+                            name={`twentyFourMonthDiscounts.${pkg}` as const}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{pkg} hrs</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder={defaultTwentyFourMonthDiscounts[pkg as keyof typeof defaultTwentyFourMonthDiscounts]?.toString() || "0"}
                                     step="1"
                                     min="0"
                                     max="100"
@@ -395,7 +512,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   {/* Prepay Discount */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">Prepay Discount (%)</h4>
-                    <FormField
+                    <FormField<PricingFormData, "prepayDiscounts.general">
                       control={form.control}
                       name="prepayDiscounts.general"
                       render={({ field }) => (
@@ -422,7 +539,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   {/* Interest Discount */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">0% Interest Discount (12 month) (%)</h4>
-                    <FormField
+                    <FormField<PricingFormData, "interestDiscounts.general">
                       control={form.control}
                       name="interestDiscounts.general"
                       render={({ field }) => (
