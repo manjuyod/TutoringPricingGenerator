@@ -287,7 +287,34 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     ]),
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
-    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' }, // Brand yellow header with black text for readability
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
+    margin: { left: 20, right: 20 }
+  });
+
+  yPosition = (pdf as any).lastAutoTable.finalY + 6;
+
+  // 24 Month Plan
+  pdf.setFontSize(9);
+  pdf.setTextColor(249, 197, 70);
+  pdf.text('24 Month Plan', 20, yPosition);
+  yPosition += 4;
+
+  autoTable(pdf, {
+    startY: yPosition,
+    head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
+    body: financingOptions.twentyFourMonth
+      .filter(({ hours }) => [128, 160, 192].includes(hours))
+      .map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
+        hours.toString(),
+        `$${adjustedHourlyRate.toFixed(2)}`,
+        `$${Math.round(totalCost)}`,
+        `${discountPercent}%`,
+        `$${Math.round(monthlyCost)}`,
+        `$${Math.round(savings)}`
+      ]),
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
     margin: { left: 20, right: 20 }
   });
 }
