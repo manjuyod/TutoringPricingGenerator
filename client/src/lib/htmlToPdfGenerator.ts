@@ -171,7 +171,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
@@ -201,7 +201,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange
@@ -233,7 +233,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 14.5, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
@@ -245,7 +245,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
   yPosition += 3;
 
-  const financingHeaders = [['Hours', 'Adj. Rate', 'Total', 'Disc', 'Monthly', 'Save']];
+  const financingHeaders = [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']];
   const financingTableStyles = { fontSize: 8, cellPadding: 2, halign: 'center' as const };
   const financingHeadStyles = {
     fillColor: [249, 197, 70] as [number, number, number],
@@ -255,10 +255,11 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   const financingMargin = { left: 20, right: 20 };
 
   const renderFinancingPlanTable = (label: string, options: FinancingOption[]) => {
+    yPosition += 1.5;
     pdf.setFontSize(9);
     pdf.setTextColor(249, 197, 70);
     pdf.text(label, 20, yPosition);
-    yPosition += 3;
+    yPosition += 2;
 
     autoTable(pdf, {
       startY: yPosition,
@@ -324,7 +325,7 @@ async function generatePaymentPlanPage2(
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
@@ -354,7 +355,7 @@ async function generatePaymentPlanPage2(
 
   // Section 2: Payment Plan Option (Yellow theme)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 14, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
@@ -433,7 +434,7 @@ async function generatePaymentPlanPage2(
 
   // Section 3: Prepay Tuition Option (Orange theme) - Moved to bottom
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
-  pdf.rect(15, yPosition - 2, 180, 16, 'F');
+  pdf.rect(15, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange

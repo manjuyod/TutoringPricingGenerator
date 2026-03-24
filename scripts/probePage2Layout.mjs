@@ -158,10 +158,10 @@ function runColumnLayout(config) {
 function runStackedLayout(config) {
   const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
   let y = renderBaseSections(pdf, config);
-  const headers = [["Hours", "Adj. Rate", "Total", "Disc", "Monthly", "Save"]];
+  const headers = [["Hours", "Adj. Rate", "Total", "Discount", "Monthly", "Savings"]];
 
   for (const rows of Object.values(financingRows)) {
-    y += 3;
+    y += 4.5;
     autoTable(pdf, {
       startY: y,
       head: headers,
