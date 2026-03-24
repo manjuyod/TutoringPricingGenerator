@@ -291,7 +291,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     margin: { left: 20, right: 20 }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 6;
+  pdf.addPage();
+  yPosition = 20;
 
   // 24 Month Plan
   pdf.setFontSize(9);
@@ -303,7 +304,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     startY: yPosition,
     head: [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']],
     body: financingOptions.twentyFourMonth
-      .filter(({ hours }) => [128, 160, 192].includes(hours))
+      .filter(({ hours }) => [128, 192].includes(hours))
       .map(({ hours, adjustedHourlyRate, totalCost, discountPercent, monthlyCost, savings }) => [
         hours.toString(),
         `$${adjustedHourlyRate.toFixed(2)}`,
