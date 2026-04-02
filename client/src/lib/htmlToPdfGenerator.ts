@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
+import { selectTwentyFourMonthPlanOptions } from './twentyFourMonthOptions';
 
 interface PdfFormData {
   version: string;
@@ -285,7 +286,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   renderFinancingPlanTable('18 Month Plan', financingOptions.eighteenMonth);
   renderFinancingPlanTable(
     '24 Month Plan',
-    financingOptions.twentyFourMonth.filter(({ hours }) => [128, 160, 192].includes(hours))
+    selectTwentyFourMonthPlanOptions(financingOptions.twentyFourMonth)
   );
 }
 
