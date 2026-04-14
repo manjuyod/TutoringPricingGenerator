@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeline, calculateMonthlyPaymentOptions, calculatePrepayOptions, calculateFinancingOptions, FinancingOption } from './pricingCalculations';
 import { LOGO_B64 } from './generatedAssets';
 import { selectTwentyFourMonthPlanOptions } from './twentyFourMonthOptions';
+import { calculatePageImagePlacement, PAGE_TWO_BOTTOM_LIMIT_MM, PDF_PAGE_FORMAT, PDF_PAGE_MM, PDF_PAGE_PX } from './pdfLayoutHelpers';
 
 interface PdfFormData {
   version: string;
@@ -47,7 +48,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
       throw new Error('Failed to calculate monthly payment options');
     }
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: PDF_PAGE_FORMAT });
 
   // Page 1: Academic Game Plan (same for both versions)
   await generatePage1(pdf, selectedSubjects, totalHours, timeline);
@@ -76,7 +77,7 @@ export async function generateAdvancedPricingPDF(formData: PdfFormData): Promise
 async function generatePage1(pdf: jsPDF, selectedSubjects: any[], totalHours: number, timeline: any[]) {
   // Create HTML content for page 1
   const htmlContent = `
-    <div style="width: 794px; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
+    <div style="width: ${PDF_PAGE_PX.width}px; padding: 40px; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #000;">
       <!-- Header Section with Logo -->
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding: 20px 0; border-bottom: 3px solid #0063a8;">
         <div>
@@ -143,6 +144,8 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   eighteenMonth: FinancingOption[];
   twentyFourMonth: FinancingOption[];
 }, totalHours: number) {
+  const pageTwoBottomMargin = PDF_PAGE_MM.height - PAGE_TWO_BOTTOM_LIMIT_MM;
+
   // Add title with brand styling and Total Recommended Hours box inline
   pdf.setFontSize(26);
   pdf.setFont('helvetica', 'bold');
@@ -172,7 +175,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
 
   // Section 1: Monthly Tuition Option (Blue theme)
   pdf.setFillColor(230, 244, 255); // Light blue background using brand blue
-  pdf.rect(15, yPosition - 1, 180, 13, 'F');
+  pdf.rect(18, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(0, 99, 168); // Brand blue
@@ -182,7 +185,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text('Pay as you go monthly. Testing fee: $75. Materials fee: $100.', 20, yPosition);
-  yPosition += 4;
+  yPosition += 3;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -195,14 +198,14 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: 'center' },
-    margin: { left: 20, right: 20 }
+    margin: { left: 20, right: 20, bottom: pageTwoBottomMargin }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 5;
+  yPosition = (pdf as any).lastAutoTable.finalY + 4;
 
   // Section 2: Prepay Tuition Option (Orange theme)
   pdf.setFillColor(255, 247, 235); // Light orange background using brand orange
-  pdf.rect(15, yPosition - 1, 180, 13, 'F');
+  pdf.rect(18, yPosition - 1, 180, 13, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(242, 106, 49); // Brand orange
@@ -212,7 +215,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
-  yPosition += 4;
+  yPosition += 3;
 
   autoTable(pdf, {
     startY: yPosition,
@@ -227,14 +230,14 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: 'center' }, // Brand orange header
-    margin: { left: 20, right: 20 }
+    margin: { left: 20, right: 20, bottom: pageTwoBottomMargin }
   });
 
-  yPosition = (pdf as any).lastAutoTable.finalY + 5;
+  yPosition = (pdf as any).lastAutoTable.finalY + 4;
 
   // Section 3: 0% Interest Tuition Option (Yellow theme only)
   pdf.setFillColor(254, 252, 232); // Light yellow background using brand yellow
-  pdf.rect(15, yPosition - 1, 180, 14.5, 'F');
+  pdf.rect(18, yPosition - 1, 180, 15, 'F');
 
   pdf.setFontSize(13);
   pdf.setTextColor(249, 197, 70); // Brand yellow
@@ -253,10 +256,10 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
     textColor: [0, 0, 0] as [number, number, number],
     halign: 'center' as const
   };
-  const financingMargin = { left: 20, right: 20 };
+  const financingMargin = { left: 20, right: 20, bottom: pageTwoBottomMargin };
 
   const renderFinancingPlanTable = (label: string, options: FinancingOption[]) => {
-    yPosition += 1.5;
+    yPosition += 2.5;
     pdf.setFontSize(9);
     pdf.setTextColor(249, 197, 70);
     pdf.text(label, 20, yPosition);
@@ -279,7 +282,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
       margin: financingMargin
     });
 
-    yPosition = (pdf as any).lastAutoTable.finalY + 3;
+    yPosition = (pdf as any).lastAutoTable.finalY + 2;
   };
 
   renderFinancingPlanTable('12 Month Plan', financingOptions.twelveMonth);
@@ -482,6 +485,11 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
   document.body.appendChild(tempDiv);
 
   try {
+    const contentElement = tempDiv.firstElementChild as HTMLElement | null;
+    if (!contentElement) {
+      throw new Error('Failed to create PDF HTML content');
+    }
+
     // If this is page 1 and has timeline data, render the line chart
     if (timeline) {
       const canvas = tempDiv.querySelector('#timelineChart') as HTMLCanvasElement;
@@ -490,10 +498,21 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
       }
     }
 
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    const contentWidthPx = Math.ceil(contentElement.scrollWidth);
+    const contentHeightPx = Math.ceil(contentElement.scrollHeight);
+    const pageImagePlacement = calculatePageImagePlacement({
+      contentHeightPx,
+      contentWidthPx,
+    });
+
     // Capture the HTML as canvas
-    const canvasCapture = await html2canvas(tempDiv, {
-      width: 794, // A4 width in pixels at 96 DPI
-      height: 1123, // A4 height in pixels at 96 DPI
+    const canvasCapture = await html2canvas(contentElement, {
+      width: contentWidthPx,
+      height: pageImagePlacement.captureHeightPx,
       scale: 2, // Higher resolution
       useCORS: true,
       allowTaint: true,
@@ -502,10 +521,14 @@ async function renderHtmlToPdf(pdf: jsPDF, htmlContent: string, timeline?: any[]
 
     // Convert canvas to image and add to PDF
     const imgData = canvasCapture.toDataURL('image/png');
-    const imgWidth = 210; // A4 width in mm
-    const imgHeight = 297; // A4 height in mm
-
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    pdf.addImage(
+      imgData,
+      'PNG',
+      pageImagePlacement.xOffsetMm,
+      0,
+      pageImagePlacement.imageWidthMm,
+      pageImagePlacement.imageHeightMm
+    );
   } finally {
     // Clean up the temporary div
     document.body.removeChild(tempDiv);

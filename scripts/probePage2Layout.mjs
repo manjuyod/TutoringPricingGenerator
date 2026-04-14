@@ -3,6 +3,10 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+const LETTER_PAGE_MM = { width: 215.9, height: 279.4 };
+const PAGE_TWO_BOTTOM_LIMIT_MM = 270;
+const BOTTOM_MARGIN = LETTER_PAGE_MM.height - PAGE_TWO_BOTTOM_LIMIT_MM;
+
 const monthlyRows = [
   ["2", "$400", "$50.00"],
   ["4", "$800", "$50.00"],
@@ -37,151 +41,51 @@ const financingRows = {
   ],
 };
 
-const configs = [
-  {
-    name: "current-side-by-side",
-    type: "columns",
-    monthlyFont: 9,
-    monthlyPad: 2,
-    financeFont: 7,
-    financePad: 1.5,
-    sectionGap: 5,
-    bodyOffset: 4,
-    planGap: 3,
-  },
-  {
-    name: "stacked-compact",
-    type: "stacked",
-    monthlyFont: 9,
-    monthlyPad: 2,
-    financeFont: 8,
-    financePad: 2,
-    sectionGap: 5,
-    bodyOffset: 3,
-    planGap: 3,
-  },
-  {
-    name: "stacked-tight",
-    type: "stacked",
-    monthlyFont: 8,
-    monthlyPad: 1.5,
-    financeFont: 7,
-    financePad: 1.5,
-    sectionGap: 4,
-    bodyOffset: 2,
-    planGap: 2,
-  },
-];
+const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "letter" });
+let y = 33;
 
-function renderBaseSections(pdf, config) {
-  let y = 33;
+y += 8;
+y += 3;
+autoTable(pdf, {
+  startY: y,
+  head: [["Hours/Week", "Monthly Cost", "Hourly Rate"]],
+  body: monthlyRows,
+  theme: "grid",
+  styles: { fontSize: 9, cellPadding: 2, halign: "center" },
+  headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: "center" },
+  margin: { left: 20, right: 20, bottom: BOTTOM_MARGIN },
+});
+y = pdf.lastAutoTable.finalY + 4;
 
-  y += 8;
-  y += config.bodyOffset;
+y += 8;
+y += 3;
+autoTable(pdf, {
+  startY: y,
+  head: [["Hours", "Adj. Rate", "Total Cost", "Discount", "Savings"]],
+  body: prepayRows,
+  theme: "grid",
+  styles: { fontSize: 9, cellPadding: 2, halign: "center" },
+  headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: "center" },
+  margin: { left: 20, right: 20, bottom: BOTTOM_MARGIN },
+});
+y = pdf.lastAutoTable.finalY + 4;
+
+y += 7;
+y += 3;
+
+for (const rows of Object.values(financingRows)) {
+  y += 2.5;
   autoTable(pdf, {
     startY: y,
-    head: [["Hours/Week", "Monthly Cost", "Hourly Rate"]],
-    body: monthlyRows,
+    head: [["Hours", "Adj. Rate", "Total", "Discount", "Monthly", "Savings"]],
+    body: rows,
     theme: "grid",
-    styles: { fontSize: config.monthlyFont, cellPadding: config.monthlyPad, halign: "center" },
-    headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: "center" },
-    margin: { left: 20, right: 20 },
+    styles: { fontSize: 8, cellPadding: 2, halign: "center" },
+    headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: "center" },
+    margin: { left: 20, right: 20, bottom: BOTTOM_MARGIN },
   });
-  y = pdf.lastAutoTable.finalY + config.sectionGap;
-
-  y += 8;
-  y += config.bodyOffset;
-  autoTable(pdf, {
-    startY: y,
-    head: [["Hours", "Adj. Rate", "Total Cost", "Discount", "Savings"]],
-    body: prepayRows,
-    theme: "grid",
-    styles: { fontSize: config.monthlyFont, cellPadding: config.monthlyPad, halign: "center" },
-    headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: "center" },
-    margin: { left: 20, right: 20 },
-  });
-  y = pdf.lastAutoTable.finalY + config.sectionGap;
-
-  y += 7;
-  y += config.bodyOffset;
-
-  return y;
+  y = pdf.lastAutoTable.finalY + 2;
 }
 
-function runColumnLayout(config) {
-  const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-  const y = renderBaseSections(pdf, config);
-  const headers = [["Hrs", "Rate", "Total", "Disc", "Mo.", "Save"]];
-  const styles = { fontSize: config.financeFont, cellPadding: config.financePad, halign: "center" };
-  const headStyles = { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: "center" };
-
-  autoTable(pdf, {
-    startY: y,
-    head: headers,
-    body: financingRows.twelveMonth,
-    theme: "grid",
-    styles,
-    headStyles,
-    margin: { left: 15, right: 137 },
-  });
-  const finalY12 = pdf.lastAutoTable.finalY;
-
-  autoTable(pdf, {
-    startY: y,
-    head: headers,
-    body: financingRows.eighteenMonth,
-    theme: "grid",
-    styles,
-    headStyles,
-    margin: { left: 77, right: 75 },
-  });
-  const finalY18 = pdf.lastAutoTable.finalY;
-
-  autoTable(pdf, {
-    startY: y,
-    head: headers,
-    body: financingRows.twentyFourMonth,
-    theme: "grid",
-    styles,
-    headStyles,
-    margin: { left: 139, right: 15 },
-  });
-  const finalY24 = pdf.lastAutoTable.finalY;
-
-  return {
-    name: config.name,
-    pages: pdf.getNumberOfPages(),
-    finalY: Number(Math.max(finalY12, finalY18, finalY24).toFixed(2)),
-  };
-}
-
-function runStackedLayout(config) {
-  const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-  let y = renderBaseSections(pdf, config);
-  const headers = [["Hours", "Adj. Rate", "Total", "Discount", "Monthly", "Savings"]];
-
-  for (const rows of Object.values(financingRows)) {
-    y += 4.5;
-    autoTable(pdf, {
-      startY: y,
-      head: headers,
-      body: rows,
-      theme: "grid",
-      styles: { fontSize: config.financeFont, cellPadding: config.financePad, halign: "center" },
-      headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: "center" },
-      margin: { left: 20, right: 20 },
-    });
-    y = pdf.lastAutoTable.finalY + config.planGap;
-  }
-
-  return {
-    name: config.name,
-    pages: pdf.getNumberOfPages(),
-    finalY: Number(y.toFixed(2)),
-  };
-}
-
-for (const config of configs) {
-  const result = config.type === "columns" ? runColumnLayout(config) : runStackedLayout(config);
-  console.log(`${result.name}: ${result.pages} page(s), finalY=${result.finalY}mm`);
-}
+console.log(`letter-three-tables: ${pdf.getNumberOfPages()} page(s), finalY=${Number(y.toFixed(2))}mm`);
+console.log(`bottom-limit=${PAGE_TWO_BOTTOM_LIMIT_MM}mm`);

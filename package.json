@@ -9,6 +9,7 @@
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "lint": "eslint . --ext .js,.ts,.tsx",
+    "probe:page1-layout": "tsx scripts/probePage1Layout.ts",
     "probe:page2-layout": "node scripts/probePage2Layout.mjs",
     "db:push": "drizzle-kit push"
   },
