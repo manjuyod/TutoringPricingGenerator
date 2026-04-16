@@ -5,6 +5,7 @@ import { SubjectHours, calculateTotalHours, getSelectedSubjects, calculateTimeli
 import { LOGO_B64 } from './generatedAssets';
 import { selectTwentyFourMonthPlanOptions } from './twentyFourMonthOptions';
 import { calculatePageImagePlacement, PAGE_TWO_BOTTOM_LIMIT_MM, PDF_PAGE_FORMAT, PDF_PAGE_MM, PDF_PAGE_PX } from './pdfLayoutHelpers';
+import { TIERED_FINANCING_TABLE_STYLES, TIERED_MONTHLY_PREPAY_TABLE_STYLES } from './tieredPage2Layout';
 
 interface PdfFormData {
   version: string;
@@ -196,7 +197,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
       `$${hourlyRate.toFixed(2)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    styles: TIERED_MONTHLY_PREPAY_TABLE_STYLES,
     headStyles: { fillColor: [0, 99, 168], textColor: 255, halign: 'center' },
     margin: { left: 20, right: 20, bottom: pageTwoBottomMargin }
   });
@@ -228,7 +229,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
       `$${Math.round(savings)}`
     ]),
     theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+    styles: TIERED_MONTHLY_PREPAY_TABLE_STYLES,
     headStyles: { fillColor: [242, 106, 49], textColor: 255, halign: 'center' }, // Brand orange header
     margin: { left: 20, right: 20, bottom: pageTwoBottomMargin }
   });
@@ -250,7 +251,6 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
   yPosition += 3;
 
   const financingHeaders = [['Hours', 'Adj. Rate', 'Total', 'Discount', 'Monthly', 'Savings']];
-  const financingTableStyles = { fontSize: 8, cellPadding: 2, halign: 'center' as const };
   const financingHeadStyles = {
     fillColor: [249, 197, 70] as [number, number, number],
     textColor: [0, 0, 0] as [number, number, number],
@@ -277,7 +277,7 @@ async function generatePage2(pdf: jsPDF, monthlyOptions: MonthlyPaymentOption[],
         `$${Math.round(savings)}`
       ]),
       theme: 'grid',
-      styles: financingTableStyles,
+      styles: TIERED_FINANCING_TABLE_STYLES,
       headStyles: financingHeadStyles,
       margin: financingMargin
     });
