@@ -367,7 +367,7 @@ async function generatePaymentPlanPage2(
 
   pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('No testing or materials fees. Flexible scheduling.', 20, yPosition);
+  pdf.text('No testing/materials fees. Flexible scheduling. No payments 4-6 weeks. No down payment or out of pocket expense. On approved credit.', 20, yPosition);
   yPosition += 4;
 
   // Calculate payment plan totals
