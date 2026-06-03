@@ -343,19 +343,11 @@ async function generatePaymentPlanPage2(
   autoTable(pdf, {
     startY: yPosition,
     head: [['Months', 'Interest', 'Monthly']],
-    body: paymentTerms.map(({ months, interest, monthly, monthlyLow, monthlyHigh }) => {
-      let monthlyDisplay;
-      if (monthlyLow !== undefined && monthlyHigh !== undefined) {
-        monthlyDisplay = `$${Math.round(monthlyLow)} - $${Math.round(monthlyHigh)}`;
-      } else {
-        monthlyDisplay = `$${Math.round(monthly)}`;
-      }
-      return [
-        months.toString(),
-        interest,
-        monthlyDisplay
-      ];
-    }),
+    body: paymentTerms.map(({ months, interest, monthlyLow, monthlyHigh }) => [
+      months.toString(),
+      interest,
+      `$${Math.round(monthlyLow)} - $${Math.round(monthlyHigh)}`
+    ]),
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
     headStyles: { fillColor: [249, 197, 70], textColor: [0, 0, 0], halign: 'center' },
@@ -660,30 +652,5 @@ function drawHorizontalBarChart(canvas: HTMLCanvasElement, timeline: any[]): voi
 
 // Helper function to draw rounded rectangle
 function drawRoundedRect(pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number) {
-  const k = pdf.internal.scaleFactor;
-  const x1 = x;
-  const y1 = y;
-  const x2 = x + width;
-  const y2 = y + height;
-
-  pdf.internal.write([
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y1) * k, 'm',
-    (x2 - radius) * k, (pdf.internal.pageSize.height - y1) * k, 'l',
-    (x2 - radius + radius * 0.552) * k, (pdf.internal.pageSize.height - y1) * k,
-    x2 * k, (pdf.internal.pageSize.height - (y1 + radius - radius * 0.552)) * k,
-    x2 * k, (pdf.internal.pageSize.height - (y1 + radius)) * k, 'c',
-    x2 * k, (pdf.internal.pageSize.height - (y2 - radius)) * k, 'l',
-    x2 * k, (pdf.internal.pageSize.height - (y2 - radius + radius * 0.552)) * k,
-    (x2 - radius + radius * 0.552) * k, (pdf.internal.pageSize.height - y2) * k,
-    (x2 - radius) * k, (pdf.internal.pageSize.height - y2) * k, 'c',
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y2) * k, 'l',
-    (x1 + radius - radius * 0.552) * k, (pdf.internal.pageSize.height - y2) * k,
-    x1 * k, (pdf.internal.pageSize.height - (y2 - radius + radius * 0.552)) * k,
-    x1 * k, (pdf.internal.pageSize.height - (y2 - radius)) * k, 'c',
-    x1 * k, (pdf.internal.pageSize.height - (y1 + radius)) * k, 'l',
-    x1 * k, (pdf.internal.pageSize.height - (y1 + radius - radius * 0.552)) * k,
-    (x1 + radius - radius * 0.552) * k, (pdf.internal.pageSize.height - y1) * k,
-    (x1 + radius) * k, (pdf.internal.pageSize.height - y1) * k, 'c',
-    'S'
-  ].join(' '));
+  pdf.roundedRect(x, y, width, height, radius, radius, 'S');
 }
