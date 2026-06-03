@@ -29,6 +29,17 @@ interface PricingFormProps {
   onValidityChange: (isValid: boolean) => void;
 }
 
+type SubjectFieldName = "beginningReading" | "reading" | "writing" | "math" | "tutorUp" | "testPrep";
+
+const subjectFields: Array<{ name: SubjectFieldName; label: string }> = [
+  { name: "beginningReading", label: "Beginning Reading/Phonics (hours)" },
+  { name: "reading", label: "Reading (hours)" },
+  { name: "writing", label: "Writing (hours)" },
+  { name: "math", label: "Math (hours)" },
+  { name: "tutorUp", label: "TutorUp (hours)" },
+  { name: "testPrep", label: "Test Prep (hours)" },
+];
+
 export default function PricingForm({ onFormDataChange, onValidityChange }: PricingFormProps) {
   const [selectedPackageRange, setSelectedPackageRange] = useState<string>("");
 
@@ -37,14 +48,14 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
     defaultValues: {
       version: "tiered",
       hourlyRate: 0,
-      weeklyHours: "",
+      weeklyHours: undefined,
       beginningReading: 0,
       reading: 0,
       writing: 0,
       math: 0,
       tutorUp: 0,
       testPrep: 0,
-      packageRange: "",
+      packageRange: undefined,
       prepayDiscounts: {},
       interestDiscounts: {},
     },
@@ -127,7 +138,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <FormField
+            <FormField<PricingFormData, "version">
               control={form.control}
               name="version"
               render={({ field }) => (
@@ -171,7 +182,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
+            <FormField<PricingFormData, "hourlyRate">
               control={form.control}
               name="hourlyRate"
               render={({ field }) => (
@@ -193,7 +204,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                 </FormItem>
               )}
             />
-            <FormField
+            <FormField<PricingFormData, "weeklyHours">
               control={form.control}
               name="weeklyHours"
               render={({ field }) => (
@@ -226,18 +237,11 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: 'beginningReading', label: 'Beginning Reading/Phonics (hours)' },
-              { name: 'reading', label: 'Reading (hours)' },
-              { name: 'writing', label: 'Writing (hours)' },
-              { name: 'math', label: 'Math (hours)' },
-              { name: 'tutorUp', label: 'TutorUp (hours)' },
-              { name: 'testPrep', label: 'Test Prep (hours)' },
-            ].map(({ name, label }) => (
-              <FormField
+            {subjectFields.map(({ name, label }) => (
+              <FormField<PricingFormData, SubjectFieldName>
                 key={name}
                 control={form.control}
-                name={name as keyof PricingFormData}
+                name={name}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{label}</FormLabel>
@@ -274,7 +278,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FormField
+              <FormField<PricingFormData, "packageRange">
                 control={form.control}
                 name="packageRange"
                 render={({ field }) => (
@@ -327,10 +331,10 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                       <h4 className="font-medium text-gray-900 mb-3">Prepay Discounts (%)</h4>
                       <div className="space-y-3">
                         {packages.map(pkg => (
-                          <FormField
+                          <FormField<PricingFormData, `prepayDiscounts.${string}`>
                             key={`prepay-${pkg}`}
                             control={form.control}
-                            name={`prepayDiscounts.${pkg}` as any}
+                            name={`prepayDiscounts.${pkg}`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>{pkg} hours - Prepay Discount (%)</FormLabel>
@@ -359,10 +363,10 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                       <h4 className="font-medium text-gray-900 mb-3">0% Interest Discounts (12 month) (%)</h4>
                       <div className="space-y-3">
                         {packages.map(pkg => (
-                          <FormField
+                          <FormField<PricingFormData, `interestDiscounts.${string}`>
                             key={`interest-${pkg}`}
                             control={form.control}
-                            name={`interestDiscounts.${pkg}` as any}
+                            name={`interestDiscounts.${pkg}`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>{pkg} hours - Interest Discount (%)</FormLabel>
@@ -395,7 +399,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   {/* Prepay Discount */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">Prepay Discount (%)</h4>
-                    <FormField
+                    <FormField<PricingFormData, "prepayDiscounts.general">
                       control={form.control}
                       name="prepayDiscounts.general"
                       render={({ field }) => (
@@ -422,7 +426,7 @@ export default function PricingForm({ onFormDataChange, onValidityChange }: Pric
                   {/* Interest Discount */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">0% Interest Discount (12 month) (%)</h4>
-                    <FormField
+                    <FormField<PricingFormData, "interestDiscounts.general">
                       control={form.control}
                       name="interestDiscounts.general"
                       render={({ field }) => (
